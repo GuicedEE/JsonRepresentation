@@ -1,3 +1,5 @@
+import com.guicedee.client.services.lifecycle.IGuiceModule;
+
 module com.guicedee.jsonrepresentation {
 	exports com.guicedee.services.jsonrepresentation;
 	exports com.guicedee.services.jsonrepresentation.json;
@@ -14,5 +16,5 @@ module com.guicedee.jsonrepresentation {
 
 	requires static jakarta.inject;
 	
-	provides com.guicedee.guicedinjection.interfaces.IGuiceModule with com.guicedee.services.jsonrepresentation.implementations.ObjectMapperBinder;
+	provides IGuiceModule with com.guicedee.services.jsonrepresentation.implementations.ObjectMapperBinder;
 }

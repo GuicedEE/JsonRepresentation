@@ -9,16 +9,16 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
-import com.guicedee.guicedinjection.interfaces.IGuiceModule;
-import com.guicedee.guicedinjection.interfaces.ObjectBinderKeys;
+import com.guicedee.client.services.lifecycle.IGuiceModule;
+import com.guicedee.client.implementations.ObjectBinderKeys;
 import com.guicedee.services.jsonrepresentation.json.LaxJsonModule;
 
 import lombok.Getter;
 import lombok.extern.java.Log;
 
 import static com.fasterxml.jackson.core.JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS;
-import static com.guicedee.guicedinjection.interfaces.ObjectBinderKeys.DefaultObjectMapper;
-import static com.guicedee.guicedinjection.interfaces.ObjectBinderKeys.JavaScriptObjectWriter;
+import static com.guicedee.client.implementations.ObjectBinderKeys.DefaultObjectMapper;
+import static com.guicedee.client.implementations.ObjectBinderKeys.JavaScriptObjectWriter;
 
 @Log
 public class ObjectMapperBinder
