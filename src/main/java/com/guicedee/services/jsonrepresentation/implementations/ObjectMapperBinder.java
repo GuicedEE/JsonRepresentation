@@ -1,9 +1,11 @@
 package com.guicedee.services.jsonrepresentation.implementations;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.inject.AbstractModule;
@@ -40,47 +42,41 @@ public class ObjectMapperBinder
     {
         //IJsonRepresentation.configureObjectMapper(objectMapper);
         javaScriptObjectMapper
-                .registerModule(new LaxJsonModule())
-                .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
-                .configure(DeserializationFeature.FAIL_ON_MISSING_CREATOR_PROPERTIES, false)
-                .configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, false)
-                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-                .configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
-                .configure(JsonGenerator.Feature.ESCAPE_NON_ASCII, true)
-                .configure(JsonGenerator.Feature.QUOTE_FIELD_NAMES, false)
-                .enable(ALLOW_UNQUOTED_CONTROL_CHARS)
+									.registerModule(new LaxJsonModule())
+									.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+									.configure(DeserializationFeature.FAIL_ON_MISSING_CREATOR_PROPERTIES, false)
+									.configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, false)
+									.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+									.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+									.configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
+									.configure(JsonGenerator.Feature.ESCAPE_NON_ASCII, true)
+									.configure(JsonGenerator.Feature.QUOTE_FIELD_NAMES, false)
+									.enable(ALLOW_UNQUOTED_CONTROL_CHARS)
+									.setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL)
                 .setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY)
                 .setVisibility(PropertyAccessor.GETTER, JsonAutoDetect.Visibility.NONE)
                 .setVisibility(PropertyAccessor.IS_GETTER, JsonAutoDetect.Visibility.NONE)
                 .setVisibility(PropertyAccessor.SETTER, JsonAutoDetect.Visibility.NONE);
 
-        objectMapper.registerModule(new LaxJsonModule())
-                .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
-                .configure(DeserializationFeature.FAIL_ON_MISSING_CREATOR_PROPERTIES, false)
-                .configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, false)
-                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-                .configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
-                .configure(JsonGenerator.Feature.ESCAPE_NON_ASCII, true)
-                .enable(ALLOW_UNQUOTED_CONTROL_CHARS)
-                .setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY)
-                .setVisibility(PropertyAccessor.GETTER, JsonAutoDetect.Visibility.NONE)
-                .setVisibility(PropertyAccessor.IS_GETTER, JsonAutoDetect.Visibility.NONE)
-                .setVisibility(PropertyAccessor.SETTER, JsonAutoDetect.Visibility.NONE);
+        objectMapper
+									.registerModule(new LaxJsonModule())
+									.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+									.configure(DeserializationFeature.FAIL_ON_MISSING_CREATOR_PROPERTIES, false)
+									.configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, false)
+									.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+									.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+									.configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
+									.configure(JsonGenerator.Feature.ESCAPE_NON_ASCII, true)
+									.enable(ALLOW_UNQUOTED_CONTROL_CHARS)
+									.enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS)
+									.setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL)
+									.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY)
+									.setVisibility(PropertyAccessor.GETTER, JsonAutoDetect.Visibility.NONE)
+									.setVisibility(PropertyAccessor.IS_GETTER, JsonAutoDetect.Visibility.NONE)
+									.setVisibility(PropertyAccessor.SETTER, JsonAutoDetect.Visibility.NONE);
 
     }
-
-    /**
-     * Applies a default set of configurations for jackson mapper
-     * @param mapper The mapper to configure
-     */
-
-
-    /**
-     * Method onBind ...
-     */
-    @SuppressWarnings("deprecation")
+				
     @Override
     public void configure()
     {
