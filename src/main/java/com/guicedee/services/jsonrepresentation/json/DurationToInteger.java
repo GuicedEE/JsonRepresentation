@@ -12,7 +12,7 @@ import static com.guicedee.services.jsonrepresentation.json.StaticStrings.STRING
 import static java.time.temporal.ChronoUnit.*;
 
 /**
- * Converts duration to an integer with each portion forced as a single digit
+ * Serializes a {@link Duration} to a compact HHMMSS-style integer value.
  */
 public class DurationToInteger
 		extends JsonSerializer<Duration>
@@ -22,6 +22,14 @@ public class DurationToInteger
 		numberFormat.setMaximumFractionDigits(0);
 		numberFormat.setMinimumIntegerDigits(1);
 	}
+	/**
+	 * Writes the duration as a compact integer representation.
+	 *
+	 * @param value the duration to serialize
+	 * @param gen the JSON generator
+	 * @param serializers the serializer provider
+	 * @throws IOException when writing fails
+	 */
 	@Override
 	public void serialize(Duration value, JsonGenerator gen, SerializerProvider serializers) throws IOException
 	{
@@ -30,6 +38,12 @@ public class DurationToInteger
 		gen.writeNumber(convert(value));
 	}
 
+	/**
+	 * Converts a duration to a HHMMSS-style integer value.
+	 *
+	 * @param value the duration to convert
+	 * @return the compact integer representation
+	 */
 	public Integer convert(Duration value)
 	{
 		String intNumber = numberFormat.format(value.get(HOURS)) + STRING_EMPTY +

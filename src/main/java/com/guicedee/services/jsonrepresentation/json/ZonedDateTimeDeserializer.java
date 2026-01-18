@@ -17,6 +17,9 @@ import java.util.logging.Level;
 
 import static com.guicedee.services.jsonrepresentation.json.StaticStrings.*;
 
+/**
+ * Lenient {@link ZonedDateTime} deserializer that accepts ISO-8601 zoned date-time strings.
+ */
 @Log
 public class ZonedDateTimeDeserializer
 				extends JsonDeserializer<ZonedDateTime>
@@ -33,6 +36,14 @@ public class ZonedDateTimeDeserializer
 													.toFormatter()
 					};
 	
+	/**
+	 * Deserializes a {@link ZonedDateTime} from a JSON scalar value.
+	 *
+	 * @param p the parser positioned at a scalar value
+	 * @param ctxt the deserialization context
+	 * @return the parsed zoned date-time, or null when input is empty
+	 * @throws IOException when parsing fails
+	 */
 	@Override
 	public ZonedDateTime deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JsonProcessingException
 	{
@@ -40,6 +51,12 @@ public class ZonedDateTimeDeserializer
 		return convert(name);
 	}
 	
+	/**
+	 * Converts a string into a {@link ZonedDateTime}.
+	 *
+	 * @param value the input string
+	 * @return the parsed zoned date-time, or null when input is empty
+	 */
 	public ZonedDateTime convert(String value)
 	{
 		if (Strings.isNullOrEmpty(value) || STRING_NULL.equalsIgnoreCase(value) || STRING_0.equals(value))

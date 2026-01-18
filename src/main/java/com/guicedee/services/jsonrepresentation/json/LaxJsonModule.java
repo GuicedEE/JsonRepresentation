@@ -13,8 +13,15 @@ import com.guicedee.services.jsonrepresentation.json.mapkeys.OffsetDateTimeDeser
 import java.io.IOException;
 import java.time.*;
 
+/**
+ * Jackson module that registers relaxed serializers and deserializers for
+ * common Java time types and lenient scalar parsing.
+ */
 public class LaxJsonModule extends SimpleModule
 {
+	/**
+	 * Creates the module with time-related serializers, deserializers, and key deserializers.
+	 */
 	public LaxJsonModule()
 	{
 		super("GuicedTimeHandler", Version.unknownVersion());

@@ -19,10 +19,21 @@ import java.util.logging.Level;
 import static com.guicedee.services.jsonrepresentation.json.LocalDateTimeDeserializer.formats;
 import static com.guicedee.services.jsonrepresentation.json.StaticStrings.*;
 
+/**
+ * Lenient {@link OffsetDateTime} deserializer that accepts multiple formats.
+ */
 @Log
 public class OffsetDateTimeDeserializer
 		extends JsonDeserializer<OffsetDateTime>
 {
+	/**
+	 * Deserializes an {@link OffsetDateTime} from a JSON scalar value.
+	 *
+	 * @param p the parser positioned at a scalar value
+	 * @param ctxt the deserialization context
+	 * @return the parsed offset date-time, or null when input is empty
+	 * @throws IOException when parsing fails
+	 */
 	@Override
 	public OffsetDateTime deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JsonProcessingException
 	{
@@ -30,6 +41,12 @@ public class OffsetDateTimeDeserializer
 		return convert(name);
 	}
 
+	/**
+	 * Converts a string into an {@link OffsetDateTime}, falling back to UTC when needed.
+	 *
+	 * @param value the input string
+	 * @return the parsed offset date-time, or null when input is empty
+	 */
 	public OffsetDateTime convert(String value)
 	{
 		if (Strings.isNullOrEmpty(value) || STRING_NULL.equalsIgnoreCase(value) || STRING_0.equals(value))
@@ -68,6 +85,13 @@ public class OffsetDateTimeDeserializer
 		}
 		return time;
 	}
+
+	/**
+	 * Converts a local date-time to UTC using the system default zone.
+	 *
+	 * @param ldt the local date-time
+	 * @return the UTC offset date-time, or null when input is null
+	 */
 	private OffsetDateTime convertToUTCDateTime(LocalDateTime ldt)
 	{
 		if (ldt == null)

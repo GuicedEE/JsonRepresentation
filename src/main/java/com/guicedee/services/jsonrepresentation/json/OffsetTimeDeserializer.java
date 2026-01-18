@@ -17,6 +17,9 @@ import java.util.logging.Level;
 
 import static com.guicedee.services.jsonrepresentation.json.StaticStrings.*;
 
+/**
+ * Lenient {@link OffsetTime} deserializer that accepts ISO-8601 time strings.
+ */
 @Log
 public class OffsetTimeDeserializer
 		extends JsonDeserializer<OffsetTime>
@@ -30,6 +33,14 @@ public class OffsetTimeDeserializer
 							                                                   .toFormatter()
 			                                                   };
 
+	/**
+	 * Deserializes an {@link OffsetTime} from a JSON scalar value.
+	 *
+	 * @param p the parser positioned at a scalar value
+	 * @param ctxt the deserialization context
+	 * @return the parsed offset time, or null when input is empty
+	 * @throws IOException when parsing fails
+	 */
 	@Override
 	public OffsetTime deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JsonProcessingException
 	{
@@ -37,6 +48,12 @@ public class OffsetTimeDeserializer
 		return convert(name);
 	}
 
+	/**
+	 * Converts a string into an {@link OffsetTime}.
+	 *
+	 * @param value the input string
+	 * @return the parsed offset time, or null when input is empty
+	 */
 	public OffsetTime convert(String value)
 	{
 		if (Strings.isNullOrEmpty(value) || STRING_NULL.equalsIgnoreCase(value) || STRING_0.equals(value))

@@ -1,5 +1,9 @@
 import com.guicedee.client.services.lifecycle.IGuiceModule;
 
+/**
+ * Provides JSON representation utilities, Jackson configuration, and Guice bindings
+ * for consistent serialization and deserialization across the application.
+ */
 module com.guicedee.jsonrepresentation {
 	exports com.guicedee.services.jsonrepresentation;
 	exports com.guicedee.services.jsonrepresentation.json;

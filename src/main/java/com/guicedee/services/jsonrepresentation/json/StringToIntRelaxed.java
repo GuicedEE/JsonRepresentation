@@ -8,11 +8,19 @@ import com.google.common.base.Strings;
 import java.io.IOException;
 
 /**
- * Converts most of the string knowns to boolean
+ * Lenient primitive integer deserializer that accepts numeric strings with decimals.
  */
 public class StringToIntRelaxed
 		extends JsonDeserializer
 {
+	/**
+	 * Deserializes a primitive integer from a JSON scalar value.
+	 *
+	 * @param p the parser positioned at a scalar value
+	 * @param ctxt the deserialization context
+	 * @return the parsed integer value
+	 * @throws IOException when parsing fails
+	 */
 	@Override
 	public Object deserialize(JsonParser p, DeserializationContext ctxt) throws IOException
 	{
@@ -20,6 +28,12 @@ public class StringToIntRelaxed
 		return convert(value);
 	}
 
+	/**
+	 * Converts a string to a primitive integer, truncating any decimal portion.
+	 *
+	 * @param value the input string
+	 * @return the parsed integer value, or 0 when the input is empty
+	 */
 	public int convert( String value)
 	{
 		if (Strings.isNullOrEmpty(value))

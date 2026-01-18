@@ -1,11 +1,14 @@
 package com.guicedee.services.jsonrepresentation;
 
+/**
+ * Runtime exception for JSON serialization/deserialization failures in this module.
+ */
 public class JsonRenderException extends RuntimeException
 {
 	private static final long serialVersionUID = 1L;
 	
 	/**
-	 * Instantiates a new Module exception.
+	 * Creates an empty JSON render exception.
 	 */
 	public JsonRenderException()
 	{
@@ -13,9 +16,9 @@ public class JsonRenderException extends RuntimeException
 	}
 	
 	/**
-	 * Instantiates a new Module exception.
+	 * Creates an exception with a message.
 	 *
-	 * @param message the message
+	 * @param message the error message
 	 */
 	public JsonRenderException(String message)
 	{
@@ -23,10 +26,10 @@ public class JsonRenderException extends RuntimeException
 	}
 	
 	/**
-	 * Instantiates a new Module exception.
+	 * Creates an exception with a message and cause.
 	 *
-	 * @param message the message
-	 * @param cause   the cause
+	 * @param message the error message
+	 * @param cause   the root cause
 	 */
 	public JsonRenderException(String message, Throwable cause)
 	{
@@ -34,9 +37,9 @@ public class JsonRenderException extends RuntimeException
 	}
 	
 	/**
-	 * Instantiates a new Module exception.
+	 * Creates an exception with a cause.
 	 *
-	 * @param cause the cause
+	 * @param cause the root cause
 	 */
 	public JsonRenderException(Throwable cause)
 	{
@@ -44,12 +47,12 @@ public class JsonRenderException extends RuntimeException
 	}
 	
 	/**
-	 * Instantiates a new Module exception.
+	 * Creates an exception with full control over suppression and stack trace.
 	 *
-	 * @param message            the message
-	 * @param cause              the cause
-	 * @param enableSuppression  the enable suppression
-	 * @param writableStackTrace the writable stack trace
+	 * @param message            the error message
+	 * @param cause              the root cause
+	 * @param enableSuppression  whether suppression is enabled
+	 * @param writableStackTrace whether the stack trace should be writable
 	 */
 	public JsonRenderException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace)
 	{

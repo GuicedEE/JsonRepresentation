@@ -12,10 +12,21 @@ import java.util.logging.Level;
 
 import static com.guicedee.services.jsonrepresentation.json.StaticStrings.*;
 
+/**
+ * Lenient {@link LocalDate} deserializer that accepts multiple date formats.
+ */
 @Log
 public class LocalDateDeserializer
 		extends JsonDeserializer<LocalDate>
 {
+	/**
+	 * Deserializes a {@link LocalDate} from a JSON scalar value.
+	 *
+	 * @param p the parser positioned at a scalar value
+	 * @param ctxt the deserialization context
+	 * @return the parsed date, or null when input is empty
+	 * @throws IOException when parsing fails
+	 */
 	@Override
 	public LocalDate deserialize(JsonParser p, DeserializationContext ctxt) throws IOException
 	{
@@ -23,6 +34,12 @@ public class LocalDateDeserializer
 		return convert(name);
 	}
 
+	/**
+	 * Converts a string into a {@link LocalDate} using the shared date-time parser.
+	 *
+	 * @param value the input string
+	 * @return the parsed date, or null when input is empty
+	 */
 	public LocalDate convert(String value)
 	{
 		if (Strings.isNullOrEmpty(value) || STRING_NULL.equalsIgnoreCase(value) || STRING_0.equals(value))

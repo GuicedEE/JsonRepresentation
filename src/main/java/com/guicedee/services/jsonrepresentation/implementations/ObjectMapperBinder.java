@@ -22,6 +22,10 @@ import static com.fasterxml.jackson.core.JsonParser.Feature.ALLOW_UNQUOTED_CONTR
 import static com.guicedee.client.implementations.ObjectBinderKeys.DefaultObjectMapper;
 import static com.guicedee.client.implementations.ObjectBinderKeys.JavaScriptObjectWriter;
 
+/**
+ * Guice module that binds shared {@link ObjectMapper} instances and configured
+ * reader/writer providers used by the JSON representation layer.
+ */
 @Log
 public class ObjectMapperBinder
         extends AbstractModule
@@ -77,6 +81,10 @@ public class ObjectMapperBinder
 
     }
 				
+    /**
+     * Binds configured {@link ObjectMapper} instances and related readers/writers
+     * into the Guice registry.
+     */
     @Override
     public void configure()
     {

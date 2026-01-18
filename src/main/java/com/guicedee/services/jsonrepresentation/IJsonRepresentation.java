@@ -21,9 +21,21 @@ import java.util.*;
 
 import static com.fasterxml.jackson.core.JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS;
 
+/**
+ * Convenience interface for JSON serialization/deserialization using a configured
+ * Jackson {@link ObjectMapper}. Includes default instance helpers for round-tripping
+ * and static helpers for reading from common sources.
+ *
+ * @param <J> the implementing type for fluent deserialization
+ */
 @SuppressWarnings("unused")
 public interface IJsonRepresentation<J> extends Serializable
 {
+    /**
+     * Applies the module's standard configuration to the supplied mapper.
+     *
+     * @param mapper the mapper to configure
+     */
     static void configureObjectMapper(ObjectMapper mapper)
     {
         mapper.registerModule(new LaxJsonModule())
@@ -46,9 +58,9 @@ public interface IJsonRepresentation<J> extends Serializable
     }
 
     /**
-     * Serializes this object as JSON
+     * Serializes this object to JSON with pretty-printing enabled.
      *
-     * @return The rendered JSON or an empty string
+     * @return the rendered JSON string
      */
     default String toJson()
     {
@@ -56,9 +68,10 @@ public interface IJsonRepresentation<J> extends Serializable
     }
 
     /**
-     * Serializes this object as JSON
+     * Serializes this object to JSON, optionally with compact output.
      *
-     * @return The rendered JSON or an empty string
+     * @param tiny when true, disables indentation for compact output
+     * @return the rendered JSON string
      */
     default String toJson(boolean tiny)
     {
@@ -81,10 +94,10 @@ public interface IJsonRepresentation<J> extends Serializable
     }
 
     /**
-     * Deserializes this object from a JSON String (updates the current object)
+     * Deserializes this object from a JSON string by updating the current instance.
      *
-     * @param json The JSON String
-     * @return This object updated
+     * @param json the JSON payload
+     * @return this instance with fields updated from JSON
      */
     default J fromJson(String json)
     {
@@ -100,10 +113,10 @@ public interface IJsonRepresentation<J> extends Serializable
     }
 
     /**
-     * Deserializes this object from a JSON String (updates the current object)
+     * Deserializes a JSON array into a list of elements.
      *
-     * @param json The JSON String
-     * @return This object updated
+     * @param json the JSON array payload
+     * @return a list of parsed elements
      */
     @SuppressWarnings({"UnusedReturnValue"})
     default List<J> fromJsonArray(String json)
@@ -122,10 +135,11 @@ public interface IJsonRepresentation<J> extends Serializable
     }
 
     /**
-     * Deserializes this object from a JSON String (updates the current object)
+     * Deserializes a JSON array into a unique, sorted set of elements.
      *
-     * @param json The JSON String
-     * @return This object updated
+     * @param json the JSON array payload
+     * @param type the element type (unused but retained for signature clarity)
+     * @return a sorted set of parsed elements
      */
     @SuppressWarnings({"UnusedReturnValue"})
     default Set<J> fromJsonArrayUnique(String json, @SuppressWarnings("unused")
@@ -145,13 +159,13 @@ public interface IJsonRepresentation<J> extends Serializable
     }
 
     /**
-     * Read direct from the stream
+     * Reads a JSON value from an input stream.
      *
-     * @param <T>
-     * @param file  the stream
-     * @param clazz
-     * @return
-     * @throws IOException
+     * @param <T>   the target type
+     * @param file  the stream to read from
+     * @param clazz the target class
+     * @return the parsed instance
+     * @throws IOException when the stream cannot be read or parsed
      */
     static <T> T From(InputStream file, Class<T> clazz) throws IOException
     {
@@ -161,13 +175,13 @@ public interface IJsonRepresentation<J> extends Serializable
 
 
     /**
-     * Read from a file
+     * Reads a JSON value from a file.
      *
-     * @param <T>
-     * @param file
-     * @param clazz
-     * @return
-     * @throws IOException
+     * @param <T>   the target type
+     * @param file  the file to read from
+     * @param clazz the target class
+     * @return the parsed instance
+     * @throws IOException when the file cannot be read or parsed
      */
     static <T> T From(File file, Class<T> clazz) throws IOException
     {
@@ -176,13 +190,13 @@ public interface IJsonRepresentation<J> extends Serializable
     }
 
     /**
-     * Read from a reader
+     * Reads a JSON value from a reader.
      *
-     * @param <T>
-     * @param file
-     * @param clazz
-     * @return
-     * @throws IOException
+     * @param <T>   the target type
+     * @param file  the reader to read from
+     * @param clazz the target class
+     * @return the parsed instance
+     * @throws IOException when the reader cannot be read or parsed
      */
     static <T> T From(Reader file, Class<T> clazz) throws IOException
     {
@@ -191,15 +205,20 @@ public interface IJsonRepresentation<J> extends Serializable
     }
 
     /**
-     * Returns the mapped object mapper
+     * Returns the configured {@link ObjectMapper}.
      *
-     * @return
+     * @return the shared object mapper
      */
     static ObjectMapper getObjectMapper()
     {
         return ObjectMapperBinder.getObjectMapper();
     }
 
+    /**
+     * Returns an {@link ObjectReader} configured for lenient parsing defaults.
+     *
+     * @return a configured reader
+     */
     static ObjectReader getJsonObjectReader()
     {
         return ObjectMapperBinder.getObjectMapper().reader()
@@ -209,13 +228,13 @@ public interface IJsonRepresentation<J> extends Serializable
     }
 
     /**
-     * Read from a content string
+     * Reads a JSON value from a string.
      *
-     * @param <T>
-     * @param content
-     * @param clazz
-     * @return
-     * @throws IOException
+     * @param <T>     the target type
+     * @param content the JSON payload
+     * @param clazz   the target class
+     * @return the parsed instance
+     * @throws IOException when the content cannot be parsed
      */
     static <T> T From(String content, Class<T> clazz) throws IOException
     {
@@ -224,13 +243,13 @@ public interface IJsonRepresentation<J> extends Serializable
     }
 
     /**
-     * Read from a URL
+     * Reads a JSON value from a URL.
      *
-     * @param <T>
-     * @param content
-     * @param clazz
-     * @return
-     * @throws IOException
+     * @param <T>     the target type
+     * @param content the URL to read from
+     * @param clazz   the target class
+     * @return the parsed instance
+     * @throws IOException when the URL cannot be read or parsed
      */
     static <T> T From(URL content, Class<T> clazz) throws IOException
     {
@@ -240,13 +259,13 @@ public interface IJsonRepresentation<J> extends Serializable
 
 
     /**
-     * Read direct from the stream
+     * Reads a JSON array from an input stream into a list.
      *
-     * @param <T>
-     * @param file  the stream
-     * @param clazz
-     * @return
-     * @throws IOException
+     * @param <T>   the element type
+     * @param file  the stream to read from
+     * @param clazz the element class
+     * @return a list of parsed elements
+     * @throws JsonRenderException when the stream cannot be read or parsed
      */
     static <T> List<T> fromToList(InputStream file, Class<T> clazz)
     {
@@ -267,13 +286,13 @@ public interface IJsonRepresentation<J> extends Serializable
     }
 
     /**
-     * Read from a URL
+     * Reads a JSON array from a URL into a list.
      *
-     * @param <T>
-     * @param content
-     * @param clazz
-     * @return
-     * @throws IOException
+     * @param <T>     the element type
+     * @param content the URL to read from
+     * @param clazz   the element class
+     * @return a list of parsed elements
+     * @throws IOException when the URL cannot be read or parsed
      */
     static <T> List<T> fromToList(URL content, Class<T> clazz) throws IOException
     {
@@ -287,13 +306,13 @@ public interface IJsonRepresentation<J> extends Serializable
     }
 
     /**
-     * Read from a file
+     * Reads a JSON array from a file into a list.
      *
-     * @param <T>
-     * @param file
-     * @param clazz
-     * @return
-     * @throws IOException
+     * @param <T>   the element type
+     * @param file  the file to read from
+     * @param clazz the element class
+     * @return a list of parsed elements
+     * @throws IOException when the file cannot be read or parsed
      */
     static <T> List<T> fromToList(File file, Class<T> clazz) throws IOException
     {
@@ -307,13 +326,13 @@ public interface IJsonRepresentation<J> extends Serializable
     }
 
     /**
-     * Read from a reader
+     * Reads a JSON array from a reader into a list.
      *
-     * @param <T>
-     * @param file
-     * @param clazz
-     * @return
-     * @throws IOException
+     * @param <T>   the element type
+     * @param file  the reader to read from
+     * @param clazz the element class
+     * @return a list of parsed elements
+     * @throws IOException when the reader cannot be read or parsed
      */
     static <T> List<T> fromToList(Reader file, Class<T> clazz) throws IOException
     {
@@ -327,13 +346,13 @@ public interface IJsonRepresentation<J> extends Serializable
     }
 
     /**
-     * Read from a content string
+     * Reads a JSON array from a string into a list.
      *
-     * @param <T>
-     * @param content
-     * @param clazz
-     * @return
-     * @throws IOException
+     * @param <T>     the element type
+     * @param content the JSON array payload
+     * @param clazz   the element class
+     * @return a list of parsed elements
+     * @throws IOException when the content cannot be parsed
      */
     static <T> List<T> fromToList(String content, Class<T> clazz) throws IOException
     {

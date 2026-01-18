@@ -17,6 +17,9 @@ import java.util.logging.Level;
 
 import static com.guicedee.services.jsonrepresentation.json.StaticStrings.*;
 
+/**
+ * Lenient {@link LocalDateTime} deserializer that accepts a wide range of formats.
+ */
 @Log
 public class LocalDateTimeDeserializer
 		extends JsonDeserializer<LocalDateTime>
@@ -127,6 +130,14 @@ public class LocalDateTimeDeserializer
 							.toFormatter()
 			};
 	
+	/**
+	 * Deserializes a {@link LocalDateTime} from a JSON scalar value.
+	 *
+	 * @param p the parser positioned at a scalar value
+	 * @param ctxt the deserialization context
+	 * @return the parsed date-time, or null when input is empty
+	 * @throws IOException when parsing fails
+	 */
 	@Override
 	public LocalDateTime deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JsonProcessingException
 	{
@@ -134,6 +145,12 @@ public class LocalDateTimeDeserializer
 		return convert(name);
 	}
 	
+	/**
+	 * Converts a string into a {@link LocalDateTime} by trying multiple formats.
+	 *
+	 * @param value the input string
+	 * @return the parsed date-time, or null when input is empty
+	 */
 	public LocalDateTime convert(String value)
 	{
 		if (Strings.isNullOrEmpty(value) || STRING_NULL.equalsIgnoreCase(value) || STRING_0.equals(value))

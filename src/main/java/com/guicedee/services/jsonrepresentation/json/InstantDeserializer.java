@@ -19,7 +19,9 @@ import java.util.Locale;
 
 import static com.guicedee.services.jsonrepresentation.json.StaticStrings.*;
 
-
+/**
+ * Lenient {@link Instant} deserializer that accepts localized date-time strings.
+ */
 public class InstantDeserializer
 		extends JsonDeserializer<Instant>
 {
@@ -37,6 +39,14 @@ public class InstantDeserializer
 							                                                   .toFormatter()
 			                                                   };
 
+	/**
+	 * Deserializes an {@link Instant} from a JSON scalar value.
+	 *
+	 * @param p the parser positioned at a scalar value
+	 * @param ctxt the deserialization context
+	 * @return the parsed instant, or null when input is empty
+	 * @throws IOException when parsing fails
+	 */
 	@Override
 	public Instant deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JsonProcessingException
 	{
@@ -44,6 +54,13 @@ public class InstantDeserializer
 		return convert(name);
 	}
 
+	/**
+	 * Converts a string into an {@link Instant} using localized short date-time format.
+	 *
+	 * @param value the input string
+	 * @return the parsed instant, or null when input is empty
+	 * @throws IOException when no supported format matches
+	 */
 	public Instant convert(String value) throws IOException
 	{
 		if (Strings.isNullOrEmpty(value) || STRING_NULL.equals(value) || STRING_0.equals(value))

@@ -7,11 +7,19 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import java.io.IOException;
 
 /**
- * Converts most of the string knowns to boolean
+ * Lenient primitive boolean deserializer that defaults to false for unknown values.
  */
 public class StringToBool
 		extends JsonDeserializer
 {
+	/**
+	 * Deserializes a primitive boolean from a JSON scalar value.
+	 *
+	 * @param p the parser positioned at a scalar value
+	 * @param ctxt the deserialization context
+	 * @return the parsed boolean value
+	 * @throws IOException when parsing fails
+	 */
 	@Override
 	public Object deserialize(JsonParser p, DeserializationContext ctxt) throws IOException
 	{
@@ -19,6 +27,12 @@ public class StringToBool
 		return convert(value);
 	}
 
+	/**
+	 * Converts a string value into a primitive boolean.
+	 *
+	 * @param value the input string
+	 * @return true for truthy values, false otherwise
+	 */
 	public boolean convert(String value)
 	{
 		Boolean bValue = new StringToBoolean().convert(value);

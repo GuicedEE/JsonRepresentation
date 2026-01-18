@@ -8,19 +8,34 @@ import com.google.common.base.Strings;
 import java.io.IOException;
 
 /**
- * Converts most of the string knowns to boolean
+ * Lenient boolean deserializer that accepts multiple string forms.
  */
 public class StringToBoolean
 		extends JsonDeserializer<Boolean>
 {
 	public static boolean nullable = true;
 
+	/**
+	 * Deserializes a boolean from a string value in the JSON payload.
+	 *
+	 * @param p the parser positioned at a scalar value
+	 * @param ctxt the deserialization context
+	 * @return the parsed Boolean value
+	 * @throws IOException when parsing fails
+	 */
 	@Override
 	public Boolean deserialize(JsonParser p, DeserializationContext ctxt) throws IOException
 	{
 		return convert(p.getValueAsString());
 	}
 
+	/**
+	 * Converts a string value into a Boolean, returning null for unknown values
+	 * when {@link #nullable} is enabled.
+	 *
+	 * @param value the input string
+	 * @return true, false, or null depending on input and configuration
+	 */
 	public Boolean convert(String value)
 	{
 		if (Strings.isNullOrEmpty(value))

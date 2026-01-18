@@ -11,11 +11,19 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
- * Converts most of the string knowns to boolean
+ * Deserializes a JSON string into a set of characters.
  */
 public class StringToCharacterSet
 		extends JsonDeserializer<Set<Character>>
 {
+	/**
+	 * Converts the JSON string into a linked set of characters.
+	 *
+	 * @param p the parser positioned at a scalar value
+	 * @param ctxt the deserialization context
+	 * @return a set of characters in encounter order
+	 * @throws IOException when parsing fails
+	 */
 	@Override
 	public Set<Character> deserialize(JsonParser p, DeserializationContext ctxt) throws IOException
 	{

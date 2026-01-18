@@ -13,7 +13,8 @@ import java.time.Duration;
 import static com.guicedee.services.jsonrepresentation.json.StaticStrings.*;
 
 /**
- * Converts most of the string knowns to boolean
+ * Lenient {@link Duration} deserializer that accepts HHmmss numeric strings
+ * or ISO-8601 duration values.
  */
 public class StringToDurationTimeSeconds extends JsonDeserializer<Duration> {
     private static final NumberFormat nf = NumberFormat.getInstance();
@@ -22,12 +23,27 @@ public class StringToDurationTimeSeconds extends JsonDeserializer<Duration> {
         nf.setMinimumIntegerDigits(2);
     }
 
+    /**
+     * Deserializes a {@link Duration} from a JSON scalar value.
+     *
+     * @param p the parser positioned at a scalar value
+     * @param ctxt the deserialization context
+     * @return the parsed duration, or null when input is empty
+     * @throws IOException when parsing fails
+     */
     @Override
     public Duration deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
         String name = p.getValueAsString();
         return convert(name);
     }
 
+    /**
+     * Converts a string to a {@link Duration}. Supports HHmmss numeric values,
+     * ISO-8601 duration strings, and scientific-notation numeric input.
+     *
+     * @param value the input string
+     * @return the parsed duration, or null when input is empty
+     */
     public Duration convert(String value)
     {
         if (Strings.isNullOrEmpty(value) || STRING_NULL.equals(value) || STRING_0.equals(value)) {

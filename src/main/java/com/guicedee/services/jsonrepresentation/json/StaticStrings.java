@@ -3,6 +3,9 @@ package com.guicedee.services.jsonrepresentation.json;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * Shared string and character constants used throughout the JSON representation module.
+ */
 @SuppressWarnings("unused")
 public class StaticStrings
 {
@@ -150,10 +153,9 @@ public class StaticStrings
 	}
 
 	/**
-	 * Sets the default charset used across the baord
+	 * Sets the default charset used across the module.
 	 *
-	 * @param charset
-	 * 		The charset to use, default StandardCharset.UTF_8
+	 * @param charset the charset to use, default is {@link StandardCharsets#UTF_8}
 	 */
 	public static void setDefaultChartset(Charset charset)
 	{

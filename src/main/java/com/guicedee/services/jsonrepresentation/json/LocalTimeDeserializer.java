@@ -14,10 +14,20 @@ import static com.guicedee.services.jsonrepresentation.json.LocalDateTimeDeseria
 import static com.guicedee.services.jsonrepresentation.json.StaticStrings.STRING_0;
 import static com.guicedee.services.jsonrepresentation.json.StaticStrings.STRING_NULL;
 
-
+/**
+ * Lenient {@link LocalTime} deserializer that accepts multiple time formats.
+ */
 public class LocalTimeDeserializer
 		extends JsonDeserializer<LocalTime>
 {
+	/**
+	 * Deserializes a {@link LocalTime} from a JSON scalar value.
+	 *
+	 * @param p the parser positioned at a scalar value
+	 * @param ctxt the deserialization context
+	 * @return the parsed time, or null when input is empty
+	 * @throws IOException when parsing fails
+	 */
 	@Override
 	public LocalTime deserialize(JsonParser p, DeserializationContext ctxt) throws IOException
 	{
@@ -25,6 +35,12 @@ public class LocalTimeDeserializer
 		return convert(name);
 	}
 	
+	/**
+	 * Converts a string into a {@link LocalTime} by trying multiple formats.
+	 *
+	 * @param value the input string
+	 * @return the parsed time, or null when input is empty
+	 */
 	public LocalTime convert(String value)
 	{
 		if (Strings.isNullOrEmpty(value) || STRING_NULL.equalsIgnoreCase(value) || STRING_0.equals(value))
