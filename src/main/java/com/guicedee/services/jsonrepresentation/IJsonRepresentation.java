@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.StreamReadConstraints;
 import com.fasterxml.jackson.core.json.JsonReadFeature;
 import com.fasterxml.jackson.core.json.JsonWriteFeature;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -38,6 +39,17 @@ public interface IJsonRepresentation<J> extends Serializable
      */
     static void configureObjectMapper(ObjectMapper mapper)
     {
+        // Apply StreamReadConstraints to the mapper's existing factory so that
+        // Vert.x DatabindCodec (and any other externally-created mapper) also
+        // honours the increased max string length for large payloads.
+        int maxStringLength = Integer.parseInt(
+                System.getProperty("JSON_MAX_STRING_LENGTH",
+                        System.getenv().getOrDefault("JSON_MAX_STRING_LENGTH", String.valueOf(250 * 1024 * 1024))));
+        mapper.getFactory().setStreamReadConstraints(
+                StreamReadConstraints.builder()
+                        .maxStringLength(maxStringLength)
+                        .build());
+
         mapper.registerModule(new LaxJsonModule())
                 .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
                 .configure(DeserializationFeature.FAIL_ON_MISSING_CREATOR_PROPERTIES, false)

@@ -13,10 +13,14 @@ import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.guicedee.client.services.lifecycle.IGuiceModule;
 import com.guicedee.client.implementations.ObjectBinderKeys;
+import com.guicedee.services.jsonrepresentation.IJsonRepresentation;
 import com.guicedee.services.jsonrepresentation.json.LaxJsonModule;
 
 import lombok.Getter;
 import lombok.extern.java.Log;
+
+import com.fasterxml.jackson.core.StreamReadConstraints;
+import com.fasterxml.jackson.core.JsonFactory;
 
 import static com.fasterxml.jackson.core.JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS;
 import static com.guicedee.client.implementations.ObjectBinderKeys.DefaultObjectMapper;
@@ -33,18 +37,36 @@ public class ObjectMapperBinder
 {
 
     /**
+     * Maximum allowed string length for JSON parsing (default 250 MB).
+     * Configurable via the system property / environment variable {@code JSON_MAX_STRING_LENGTH}.
+     */
+    private static final int MAX_STRING_LENGTH = Integer.parseInt(
+            System.getProperty("JSON_MAX_STRING_LENGTH",
+                    System.getenv().getOrDefault("JSON_MAX_STRING_LENGTH", String.valueOf(250 * 1024 * 1024))));
+
+    /**
      * If the object mapper must behave as a singleton
      */
     public static boolean singleton = true;
 
     @Getter
-    private static final ObjectMapper objectMapper = new ObjectMapper();
+    private static final ObjectMapper objectMapper = new ObjectMapper(
+            JsonFactory.builder()
+                    .streamReadConstraints(StreamReadConstraints.builder()
+                            .maxStringLength(MAX_STRING_LENGTH)
+                            .build())
+                    .build());
     @Getter
-    private static final ObjectMapper javaScriptObjectMapper = new ObjectMapper();
+    private static final ObjectMapper javaScriptObjectMapper = new ObjectMapper(
+            JsonFactory.builder()
+                    .streamReadConstraints(StreamReadConstraints.builder()
+                            .maxStringLength(MAX_STRING_LENGTH)
+                            .build())
+                    .build());
 
     static
     {
-        //IJsonRepresentation.configureObjectMapper(objectMapper);
+        IJsonRepresentation.configureObjectMapper(objectMapper);
         javaScriptObjectMapper
 									.registerModule(new LaxJsonModule())
 									.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
