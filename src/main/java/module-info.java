@@ -5,8 +5,8 @@ import com.guicedee.client.services.lifecycle.IGuiceModule;
  * for consistent serialization and deserialization across the application.
  */
 module com.guicedee.jsonrepresentation {
-	exports com.guicedee.services.jsonrepresentation;
-	exports com.guicedee.services.jsonrepresentation.json;
+	exports com.guicedee.modules.services.jsonrepresentation;
+	exports com.guicedee.modules.services.jsonrepresentation.json;
 	
 	requires transitive com.fasterxml.jackson.databind;
 	requires transitive com.fasterxml.jackson.core;
@@ -20,5 +20,5 @@ module com.guicedee.jsonrepresentation {
 
 	requires static jakarta.inject;
 	
-	provides IGuiceModule with com.guicedee.services.jsonrepresentation.implementations.ObjectMapperBinder;
+	provides IGuiceModule with com.guicedee.modules.services.jsonrepresentation.implementations.ObjectMapperBinder;
 }

@@ -1,0 +1,192 @@
+package com.guicedee.modules.services.jsonrepresentation.implementations;
+
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.MapperFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.google.inject.AbstractModule;
+import com.google.inject.Provider;
+import com.google.inject.Singleton;
+import com.guicedee.client.services.lifecycle.IGuiceModule;
+import com.guicedee.client.implementations.ObjectBinderKeys;
+import com.guicedee.modules.services.jsonrepresentation.IJsonRepresentation;
+import com.guicedee.modules.services.jsonrepresentation.json.LaxJsonModule;
+
+import lombok.Getter;
+import lombok.extern.java.Log;
+
+import com.fasterxml.jackson.core.StreamReadConstraints;
+import com.fasterxml.jackson.core.JsonFactory;
+
+import static com.fasterxml.jackson.core.JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS;
+import static com.guicedee.client.implementations.ObjectBinderKeys.DefaultObjectMapper;
+import static com.guicedee.client.implementations.ObjectBinderKeys.JavaScriptObjectWriter;
+
+/**
+ * Guice module that binds shared {@link ObjectMapper} instances and configured
+ * reader/writer providers used by the JSON representation layer.
+ */
+@Log
+public class ObjectMapperBinder
+        extends AbstractModule
+        implements IGuiceModule<ObjectMapperBinder>
+{
+
+    /**
+     * Maximum allowed string length for JSON parsing (default 250 MB).
+     * Configurable via the system property / environment variable {@code JSON_MAX_STRING_LENGTH}.
+     */
+    private static final int MAX_STRING_LENGTH = Integer.parseInt(
+            System.getProperty("JSON_MAX_STRING_LENGTH",
+                    System.getenv().getOrDefault("JSON_MAX_STRING_LENGTH", String.valueOf(250 * 1024 * 1024))));
+
+    /**
+     * If the object mapper must behave as a singleton
+     */
+    public static boolean singleton = true;
+
+    @Getter
+    private static final ObjectMapper objectMapper = new ObjectMapper(
+            JsonFactory.builder()
+                    .streamReadConstraints(StreamReadConstraints.builder()
+                            .maxStringLength(MAX_STRING_LENGTH)
+                            .build())
+                    .build());
+    @Getter
+    private static final ObjectMapper javaScriptObjectMapper = new ObjectMapper(
+            JsonFactory.builder()
+                    .streamReadConstraints(StreamReadConstraints.builder()
+                            .maxStringLength(MAX_STRING_LENGTH)
+                            .build())
+                    .build());
+
+    static
+    {
+        IJsonRepresentation.configureObjectMapper(objectMapper);
+        javaScriptObjectMapper
+									.registerModule(new LaxJsonModule())
+									.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+									.configure(DeserializationFeature.FAIL_ON_MISSING_CREATOR_PROPERTIES, false)
+									.configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, false)
+									.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+									.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+									.configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
+									.configure(JsonGenerator.Feature.ESCAPE_NON_ASCII, true)
+									.configure(JsonGenerator.Feature.QUOTE_FIELD_NAMES, false)
+									.enable(ALLOW_UNQUOTED_CONTROL_CHARS)
+									.setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL)
+                .setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY)
+                .setVisibility(PropertyAccessor.GETTER, JsonAutoDetect.Visibility.NONE)
+                .setVisibility(PropertyAccessor.IS_GETTER, JsonAutoDetect.Visibility.NONE)
+                .setVisibility(PropertyAccessor.SETTER, JsonAutoDetect.Visibility.NONE);
+
+        objectMapper
+									.registerModule(new LaxJsonModule())
+									.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+									.configure(DeserializationFeature.FAIL_ON_MISSING_CREATOR_PROPERTIES, false)
+									.configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, false)
+									.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+									.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+									.configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
+									.configure(JsonGenerator.Feature.ESCAPE_NON_ASCII, true)
+									.enable(ALLOW_UNQUOTED_CONTROL_CHARS)
+									.enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS)
+									.setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL)
+									.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY)
+									.setVisibility(PropertyAccessor.GETTER, JsonAutoDetect.Visibility.NONE)
+									.setVisibility(PropertyAccessor.IS_GETTER, JsonAutoDetect.Visibility.NONE)
+									.setVisibility(PropertyAccessor.SETTER, JsonAutoDetect.Visibility.NONE);
+
+    }
+				
+    /**
+     * Binds configured {@link ObjectMapper} instances and related readers/writers
+     * into the Guice registry.
+     */
+    @Override
+    public void configure()
+    {
+        log.config("Bound ObjectMapper (DefaultObjectMapper) as singleton [" + singleton + "]");
+        var p = (Provider<ObjectMapper>) () -> objectMapper;
+        if (singleton)
+        {
+            bind(DefaultObjectMapper)
+                    .toProvider(p)
+                    .in(Singleton.class);
+        }
+        else
+        {
+            bind(DefaultObjectMapper)
+                    .toProvider(p);
+        }
+
+        log.fine("Bound ObjectWriter.class @Named(JSON)");
+
+        bind(ObjectBinderKeys.JSONObjectWriter)
+                .toProvider(() ->
+                        objectMapper
+                                .writerWithDefaultPrettyPrinter()
+                                .with(SerializationFeature.INDENT_OUTPUT)
+                                .with(SerializationFeature.WRITE_ENUMS_USING_TO_STRING)
+                                .with(JsonGenerator.Feature.QUOTE_FIELD_NAMES)
+                                .without(SerializationFeature.FAIL_ON_EMPTY_BEANS)
+                                .withoutFeatures(SerializationFeature.FAIL_ON_UNWRAPPED_TYPE_IDENTIFIERS));
+
+        bind(ObjectBinderKeys.JSONObjectWriterTiny)
+                .toProvider(() ->
+                        objectMapper
+                                .writer()
+                                .without(SerializationFeature.INDENT_OUTPUT)
+                                .with(SerializationFeature.WRITE_ENUMS_USING_TO_STRING)
+                                .with(JsonGenerator.Feature.QUOTE_FIELD_NAMES)
+                                .without(SerializationFeature.FAIL_ON_EMPTY_BEANS)
+                                .withoutFeatures(SerializationFeature.FAIL_ON_UNWRAPPED_TYPE_IDENTIFIERS));
+
+        bind(ObjectBinderKeys.JSONObjectReader)
+                .toProvider(() ->
+                        objectMapper
+                                .reader()
+                                .with(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
+                                .with(DeserializationFeature.ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT)
+                                .without(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+                );
+
+        log.fine("Bound ObjectWriter.class @Named(JavaScriptObjectReader)");
+        bind(ObjectBinderKeys.JavascriptObjectMapper)
+                .toInstance(javaScriptObjectMapper);
+
+
+        bind(JavaScriptObjectWriter)
+                .toProvider(() ->
+                        javaScriptObjectMapper
+                                .writerWithDefaultPrettyPrinter()
+                                .with(SerializationFeature.INDENT_OUTPUT)
+                                .with(SerializationFeature.WRITE_ENUMS_USING_TO_STRING)
+                                .without(JsonGenerator.Feature.QUOTE_FIELD_NAMES)
+                                .without(SerializationFeature.FAIL_ON_EMPTY_BEANS)
+                                .withoutFeatures(SerializationFeature.FAIL_ON_UNWRAPPED_TYPE_IDENTIFIERS));
+
+        bind(ObjectBinderKeys.JavaScriptObjectWriterTiny)
+                .toProvider(() ->
+                        javaScriptObjectMapper
+                                .writer()
+                                .without(SerializationFeature.INDENT_OUTPUT)
+                                .with(SerializationFeature.WRITE_ENUMS_USING_TO_STRING)
+                                .without(JsonGenerator.Feature.QUOTE_FIELD_NAMES)
+                                .without(SerializationFeature.FAIL_ON_EMPTY_BEANS)
+                                .withoutFeatures(SerializationFeature.FAIL_ON_UNWRAPPED_TYPE_IDENTIFIERS));
+
+        bind(ObjectBinderKeys.JavaScriptObjectReader)
+                .toProvider(() ->
+                        javaScriptObjectMapper
+                                .reader()
+                                .with(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
+                                .with(DeserializationFeature.ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT)
+                                .without(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+                );
+    }
+}
