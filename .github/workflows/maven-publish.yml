@@ -8,10 +8,12 @@ on:
         default: false
   push:
 jobs:
-  AOP:
+  JSON:
     uses: GuicedEE/Workflows/.github/workflows/projects.yml@master
     with:
       baseDir: ''
       name: 'JSON Representation'
+      sonarProjectName: 'GuicedEE_JsonRepresentation'
+      sonarOrganization: 'guicedee'
       publishToCentral: ${{inputs.centralRelease}}
     secrets: inherit
