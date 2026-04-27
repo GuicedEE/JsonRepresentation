@@ -28,7 +28,7 @@ Built on [Jackson Databind](https://github.com/FasterXML/jackson-databind) · JP
 <summary>Gradle (Kotlin DSL)</summary>
 
 ```kotlin
-implementation("com.guicedee.modules.representations:json-representation:2.0.0-RC11")
+implementation("com.guicedee.modules.representations:json-representation:2.0.1-SNAPSHOT")
 ```
 </details>
 
