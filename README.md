@@ -7,7 +7,6 @@
 ![Java 25+](https://img.shields.io/badge/Java-25%2B-green)
 ![Guice 7](https://img.shields.io/badge/Guice-7%2B-green)
 ![Jackson](https://img.shields.io/badge/Jackson-2.21.x-green)
-![Maven 4](https://img.shields.io/badge/Maven-4%2B-green)
 
 Pre-configured [Jackson](https://github.com/FasterXML/jackson) ObjectMapper setup, Guice bindings, and a mixin interface for painless JSON serialization/deserialization across the [GuicedEE](https://github.com/GuicedEE) ecosystem.
 
