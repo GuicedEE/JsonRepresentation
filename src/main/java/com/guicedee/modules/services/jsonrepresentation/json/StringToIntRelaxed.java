@@ -1,8 +1,8 @@
 package com.guicedee.modules.services.jsonrepresentation.json;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.ValueDeserializer;
 import com.google.common.base.Strings;
 
 import java.io.IOException;
@@ -11,7 +11,7 @@ import java.io.IOException;
  * Lenient primitive integer deserializer that accepts numeric strings with decimals.
  */
 public class StringToIntRelaxed
-		extends JsonDeserializer
+		extends ValueDeserializer
 {
 	/**
 	 * Deserializes a primitive integer from a JSON scalar value.
@@ -22,7 +22,7 @@ public class StringToIntRelaxed
 	 * @throws IOException when parsing fails
 	 */
 	@Override
-	public Object deserialize(JsonParser p, DeserializationContext ctxt) throws IOException
+	public Object deserialize(JsonParser p, DeserializationContext ctxt)
 	{
 		String value = p.getValueAsString();
 		return convert(value);

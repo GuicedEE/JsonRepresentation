@@ -1,8 +1,8 @@
 package com.guicedee.modules.services.jsonrepresentation.json;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.ValueSerializer;
+import tools.jackson.databind.SerializationContext;
 
 import java.io.IOException;
 import java.time.LocalTime;
@@ -12,7 +12,7 @@ import java.time.format.DateTimeFormatter;
  * Serializes {@link LocalTime} values using a fixed HHmmss pattern.
  */
 public class LocalTimeSerializer
-		extends JsonSerializer<LocalTime>
+		extends ValueSerializer<LocalTime>
 {
 	public static final DateTimeFormatter[] formats = new DateTimeFormatter[]{
 			DateTimeFormatter.ofPattern("HHmmss"),
@@ -36,7 +36,7 @@ public class LocalTimeSerializer
 	 * @throws IOException when writing fails
 	 */
 	@Override
-	public void serialize(LocalTime value, JsonGenerator generator, SerializerProvider provider) throws IOException
+	public void serialize(LocalTime value, JsonGenerator generator, SerializationContext provider)
 	{
 		generator.writeString(convert(value));
 	}

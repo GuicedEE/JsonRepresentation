@@ -1,7 +1,7 @@
 package com.guicedee.modules.services.jsonrepresentation.json;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.ValueSerializer;
+import tools.jackson.databind.SerializationContext;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -11,7 +11,7 @@ import java.time.format.DateTimeFormatter;
  * Serializes {@link LocalDate} values using a configurable date pattern.
  */
 public class LocalDateSerializer
-        extends JsonSerializer<LocalDate> {
+        extends ValueSerializer<LocalDate> {
     public static String LocalDateFormat = "yyyy-MM-dd";
 
     public LocalDateSerializer() {
@@ -26,7 +26,7 @@ public class LocalDateSerializer
      * @throws IOException when writing fails
      */
     @Override
-    public void serialize(LocalDate value, JsonGenerator generator, SerializerProvider provider) throws IOException {
+    public void serialize(LocalDate value, JsonGenerator generator, SerializationContext provider) {
         generator.writeString(convert(value));
     }
     

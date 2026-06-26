@@ -1,7 +1,7 @@
 package com.guicedee.modules.services.jsonrepresentation.json.mapkeys;
 
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.KeyDeserializer;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.KeyDeserializer;
 import com.guicedee.modules.services.jsonrepresentation.json.OffsetDateTimeDeserializer;
 
 import java.io.IOException;
@@ -21,7 +21,7 @@ public class OffsetDateTimeDeserializerKey
 	 * @throws IOException when parsing fails
 	 */
 	@Override
-	public Object deserializeKey(String key, DeserializationContext ctxt) throws IOException
+	public Object deserializeKey(String key, DeserializationContext ctxt)
 	{
 		return new OffsetDateTimeDeserializer().convert(key);
 	}

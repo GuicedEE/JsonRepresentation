@@ -1,8 +1,8 @@
 package com.guicedee.modules.services.jsonrepresentation.json;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.ValueDeserializer;
 import com.google.common.base.Strings;
 import lombok.extern.java.Log;
 
@@ -17,7 +17,7 @@ import static com.guicedee.modules.services.jsonrepresentation.json.StaticString
  */
 @Log
 public class LocalDateDeserializer
-		extends JsonDeserializer<LocalDate>
+		extends ValueDeserializer<LocalDate>
 {
 	/**
 	 * Deserializes a {@link LocalDate} from a JSON scalar value.
@@ -28,7 +28,7 @@ public class LocalDateDeserializer
 	 * @throws IOException when parsing fails
 	 */
 	@Override
-	public LocalDate deserialize(JsonParser p, DeserializationContext ctxt) throws IOException
+	public LocalDate deserialize(JsonParser p, DeserializationContext ctxt)
 	{
 		String name = p.getValueAsString();
 		return convert(name);

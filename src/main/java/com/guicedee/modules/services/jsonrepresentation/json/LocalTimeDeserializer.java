@@ -1,8 +1,8 @@
 package com.guicedee.modules.services.jsonrepresentation.json;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.ValueDeserializer;
 import com.google.common.base.Strings;
 
 import java.io.IOException;
@@ -18,7 +18,7 @@ import static com.guicedee.modules.services.jsonrepresentation.json.StaticString
  * Lenient {@link LocalTime} deserializer that accepts multiple time formats.
  */
 public class LocalTimeDeserializer
-		extends JsonDeserializer<LocalTime>
+		extends ValueDeserializer<LocalTime>
 {
 	/**
 	 * Deserializes a {@link LocalTime} from a JSON scalar value.
@@ -29,7 +29,7 @@ public class LocalTimeDeserializer
 	 * @throws IOException when parsing fails
 	 */
 	@Override
-	public LocalTime deserialize(JsonParser p, DeserializationContext ctxt) throws IOException
+	public LocalTime deserialize(JsonParser p, DeserializationContext ctxt)
 	{
 		String name = p.getValueAsString();
 		return convert(name);

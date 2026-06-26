@@ -1,11 +1,10 @@
 package com.guicedee.modules.services.jsonrepresentation.json;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.Version;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.module.SimpleModule;
+import tools.jackson.core.JsonParser;
+import tools.jackson.core.Version;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.ValueDeserializer;
+import tools.jackson.databind.module.SimpleModule;
 import com.guicedee.modules.services.jsonrepresentation.json.mapkeys.LocalDateDeserializerKey;
 import com.guicedee.modules.services.jsonrepresentation.json.mapkeys.LocalDateTimeDeserializerKey;
 import com.guicedee.modules.services.jsonrepresentation.json.mapkeys.OffsetDateTimeDeserializerKey;
@@ -27,26 +26,26 @@ public class LaxJsonModule extends SimpleModule
 		super("GuicedTimeHandler", Version.unknownVersion());
 		
 		addDeserializer(Boolean.class, new StringToBoolean())
-				.addDeserializer(boolean.class, new JsonDeserializer()
+				.addDeserializer(boolean.class, new ValueDeserializer()
 				{
 					@Override
-					public Object deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JsonProcessingException
+					public Object deserialize(JsonParser p, DeserializationContext ctxt)
 					{
 						return new StringToBool().deserialize(p, ctxt);
 					}
 				})
-				.addDeserializer(int.class, new JsonDeserializer()
+				.addDeserializer(int.class, new ValueDeserializer()
 				{
 					@Override
-					public Object deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JsonProcessingException
+					public Object deserialize(JsonParser p, DeserializationContext ctxt)
 					{
 						return new StringToIntRelaxed().deserialize(p, ctxt);
 					}
 				})
-				.addDeserializer(Integer.class, new JsonDeserializer()
+				.addDeserializer(Integer.class, new ValueDeserializer()
 				{
 					@Override
-					public Object deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JsonProcessingException
+					public Object deserialize(JsonParser p, DeserializationContext ctxt)
 					{
 						return new StringToIntegerRelaxed().deserialize(p, ctxt);
 					}

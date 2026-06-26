@@ -1,8 +1,8 @@
 package com.guicedee.modules.services.jsonrepresentation.json;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.ValueSerializer;
+import tools.jackson.databind.SerializationContext;
 
 import java.io.IOException;
 import java.text.NumberFormat;
@@ -15,7 +15,7 @@ import static java.time.temporal.ChronoUnit.*;
  * Serializes a {@link Duration} to a compact HHMMSS-style integer value.
  */
 public class DurationToInteger
-		extends JsonSerializer<Duration>
+		extends ValueSerializer<Duration>
 {
 	private static final NumberFormat numberFormat = NumberFormat.getNumberInstance();
 	static {
@@ -31,7 +31,7 @@ public class DurationToInteger
 	 * @throws IOException when writing fails
 	 */
 	@Override
-	public void serialize(Duration value, JsonGenerator gen, SerializerProvider serializers) throws IOException
+	public void serialize(Duration value, JsonGenerator gen, SerializationContext serializers)
 	{
 		if(value == null)
 			return ;

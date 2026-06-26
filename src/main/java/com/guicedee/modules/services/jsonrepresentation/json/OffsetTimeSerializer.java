@@ -1,8 +1,8 @@
 package com.guicedee.modules.services.jsonrepresentation.json;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.ValueSerializer;
+import tools.jackson.databind.SerializationContext;
 
 import java.io.IOException;
 import java.time.OffsetTime;
@@ -12,7 +12,7 @@ import java.time.format.DateTimeFormatter;
  * Serializes {@link OffsetTime} values as ISO-8601 offset time strings.
  */
 public class OffsetTimeSerializer
-		extends JsonSerializer<OffsetTime>
+		extends ValueSerializer<OffsetTime>
 {
 	public OffsetTimeSerializer()
 	{
@@ -27,7 +27,7 @@ public class OffsetTimeSerializer
 	 * @throws IOException when writing fails
 	 */
 	@Override
-	public void serialize(OffsetTime value, JsonGenerator generator, SerializerProvider provider) throws IOException
+	public void serialize(OffsetTime value, JsonGenerator generator, SerializationContext provider)
 	{
 		generator.writeString(DateTimeFormatter.ISO_OFFSET_TIME.format(value));
 	}

@@ -1,8 +1,8 @@
 package com.guicedee.modules.services.jsonrepresentation.json;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.ValueDeserializer;
 
 import java.io.IOException;
 
@@ -10,7 +10,7 @@ import java.io.IOException;
  * Lenient primitive boolean deserializer that defaults to false for unknown values.
  */
 public class StringToBool
-		extends JsonDeserializer
+		extends ValueDeserializer
 {
 	/**
 	 * Deserializes a primitive boolean from a JSON scalar value.
@@ -21,7 +21,7 @@ public class StringToBool
 	 * @throws IOException when parsing fails
 	 */
 	@Override
-	public Object deserialize(JsonParser p, DeserializationContext ctxt) throws IOException
+	public Object deserialize(JsonParser p, DeserializationContext ctxt)
 	{
 		String value = p.getValueAsString();
 		return convert(value);

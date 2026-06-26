@@ -1,8 +1,8 @@
 package com.guicedee.modules.services.jsonrepresentation.json;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.ValueSerializer;
+import tools.jackson.databind.SerializationContext;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -12,7 +12,7 @@ import java.time.format.DateTimeFormatter;
  * Serializes zoned date-time values using ISO-8601 format.
  */
 public class ZonedDateTimeSerializer
-		extends JsonSerializer<LocalDateTime>
+		extends ValueSerializer<LocalDateTime>
 {
 	public ZonedDateTimeSerializer()
 	{
@@ -27,7 +27,7 @@ public class ZonedDateTimeSerializer
 	 * @throws IOException when writing fails
 	 */
 	@Override
-	public void serialize(LocalDateTime value, JsonGenerator generator, SerializerProvider provider) throws IOException
+	public void serialize(LocalDateTime value, JsonGenerator generator, SerializationContext provider)
 	{
 		generator.writeString(value.format(DateTimeFormatter.ISO_ZONED_DATE_TIME));
 	}

@@ -2,33 +2,37 @@ package com.guicedee.modules.services.jsonrepresentation.implementations;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.MapperFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.guicedee.client.services.lifecycle.IGuiceModule;
 import com.guicedee.client.implementations.ObjectBinderKeys;
-import com.guicedee.modules.services.jsonrepresentation.IJsonRepresentation;
 import com.guicedee.modules.services.jsonrepresentation.json.LaxJsonModule;
 
 import lombok.Getter;
 import lombok.extern.java.Log;
 
-import com.fasterxml.jackson.core.StreamReadConstraints;
-import com.fasterxml.jackson.core.JsonFactory;
+import tools.jackson.core.StreamReadConstraints;
+import tools.jackson.core.json.JsonFactory;
+import tools.jackson.core.json.JsonReadFeature;
+import tools.jackson.core.json.JsonWriteFeature;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.MapperFeature;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.cfg.DateTimeFeature;
+import tools.jackson.databind.cfg.EnumFeature;
+import tools.jackson.databind.json.JsonMapper;
 
-import static com.fasterxml.jackson.core.JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS;
 import static com.guicedee.client.implementations.ObjectBinderKeys.DefaultObjectMapper;
 import static com.guicedee.client.implementations.ObjectBinderKeys.JavaScriptObjectWriter;
 
 /**
  * Guice module that binds shared {@link ObjectMapper} instances and configured
  * reader/writer providers used by the JSON representation layer.
+ * <p>
+ * Jackson 3 mappers are immutable; all configuration is therefore applied via the
+ * {@link JsonMapper.Builder} at construction time.
  */
 @Log
 public class ObjectMapperBinder
@@ -50,59 +54,72 @@ public class ObjectMapperBinder
     public static boolean singleton = true;
 
     @Getter
-    private static final ObjectMapper objectMapper = new ObjectMapper(
-            JsonFactory.builder()
-                    .streamReadConstraints(StreamReadConstraints.builder()
-                            .maxStringLength(MAX_STRING_LENGTH)
-                            .build())
-                    .build());
+    private static ObjectMapper objectMapper = buildMapper(true, true);
+
     @Getter
-    private static final ObjectMapper javaScriptObjectMapper = new ObjectMapper(
-            JsonFactory.builder()
-                    .streamReadConstraints(StreamReadConstraints.builder()
-                            .maxStringLength(MAX_STRING_LENGTH)
-                            .build())
-                    .build());
+    private static ObjectMapper javaScriptObjectMapper = buildMapper(false, false);
 
-    static
+    /**
+     * Registers an additional Jackson {@link tools.jackson.databind.JacksonModule} onto the shared
+     * mappers. Jackson 3 mappers are immutable, so this rebuilds the shared instances with the
+     * extra module applied. Intended to be called during startup (e.g. by plugins that contribute
+     * custom (de)serializers); callers obtaining a mapper afterwards via
+     * {@link #getObjectMapper()} receive the reconfigured instance.
+     *
+     * @param module the Jackson module to add
+     */
+    public static synchronized void registerModule(tools.jackson.databind.JacksonModule module)
     {
-        IJsonRepresentation.configureObjectMapper(objectMapper);
-        javaScriptObjectMapper
-									.registerModule(new LaxJsonModule())
-									.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
-									.configure(DeserializationFeature.FAIL_ON_MISSING_CREATOR_PROPERTIES, false)
-									.configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, false)
-									.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-									.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-									.configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
-									.configure(JsonGenerator.Feature.ESCAPE_NON_ASCII, true)
-									.configure(JsonGenerator.Feature.QUOTE_FIELD_NAMES, false)
-									.enable(ALLOW_UNQUOTED_CONTROL_CHARS)
-									.setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL)
-                .setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY)
-                .setVisibility(PropertyAccessor.GETTER, JsonAutoDetect.Visibility.NONE)
-                .setVisibility(PropertyAccessor.IS_GETTER, JsonAutoDetect.Visibility.NONE)
-                .setVisibility(PropertyAccessor.SETTER, JsonAutoDetect.Visibility.NONE);
-
-        objectMapper
-									.registerModule(new LaxJsonModule())
-									.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
-									.configure(DeserializationFeature.FAIL_ON_MISSING_CREATOR_PROPERTIES, false)
-									.configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, false)
-									.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-									.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-									.configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
-									.configure(JsonGenerator.Feature.ESCAPE_NON_ASCII, true)
-									.enable(ALLOW_UNQUOTED_CONTROL_CHARS)
-									.enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS)
-									.setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL)
-									.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY)
-									.setVisibility(PropertyAccessor.GETTER, JsonAutoDetect.Visibility.NONE)
-									.setVisibility(PropertyAccessor.IS_GETTER, JsonAutoDetect.Visibility.NONE)
-									.setVisibility(PropertyAccessor.SETTER, JsonAutoDetect.Visibility.NONE);
-
+        if (module == null)
+        {
+            return;
+        }
+        objectMapper = objectMapper.rebuild().addModule(module).build();
+        javaScriptObjectMapper = javaScriptObjectMapper.rebuild().addModule(module).build();
     }
-				
+
+    /**
+     * Builds a fully configured immutable {@link ObjectMapper} for Jackson 3.
+     *
+     * @param quotePropertyNames    whether property names should be quoted on write
+     * @param caseInsensitiveEnums  whether enum parsing should be case-insensitive
+     * @return a configured object mapper instance
+     */
+    private static ObjectMapper buildMapper(boolean quotePropertyNames, boolean caseInsensitiveEnums)
+    {
+        JsonFactory factory = JsonFactory.builder()
+                .streamReadConstraints(StreamReadConstraints.builder()
+                        .maxStringLength(MAX_STRING_LENGTH)
+                        .build())
+                .build();
+
+        JsonMapper.Builder builder = JsonMapper.builder(factory)
+                .addModule(new LaxJsonModule())
+                .configure(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+                .configure(DeserializationFeature.FAIL_ON_MISSING_CREATOR_PROPERTIES, false)
+                .configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, false)
+                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+                .configure(EnumFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
+                .configure(JsonWriteFeature.ESCAPE_NON_ASCII, true)
+                .configure(JsonWriteFeature.QUOTE_PROPERTY_NAMES, quotePropertyNames)
+                .configure(JsonReadFeature.ALLOW_UNQUOTED_PROPERTY_NAMES, true)
+                .configure(JsonReadFeature.ALLOW_SINGLE_QUOTES, true)
+                .configure(JsonReadFeature.ALLOW_UNESCAPED_CONTROL_CHARS, true)
+                .changeDefaultVisibility(vc -> vc
+                        .withFieldVisibility(JsonAutoDetect.Visibility.ANY)
+                        .withGetterVisibility(JsonAutoDetect.Visibility.NONE)
+                        .withIsGetterVisibility(JsonAutoDetect.Visibility.NONE)
+                        .withSetterVisibility(JsonAutoDetect.Visibility.NONE))
+                .changeDefaultPropertyInclusion(incl -> incl.withValueInclusion(JsonInclude.Include.NON_NULL));
+
+        if (caseInsensitiveEnums)
+        {
+            builder = builder.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS, true);
+        }
+
+        return builder.build();
+    }
+
     /**
      * Binds configured {@link ObjectMapper} instances and related readers/writers
      * into the Guice registry.
@@ -131,8 +148,8 @@ public class ObjectMapperBinder
                         objectMapper
                                 .writerWithDefaultPrettyPrinter()
                                 .with(SerializationFeature.INDENT_OUTPUT)
-                                .with(SerializationFeature.WRITE_ENUMS_USING_TO_STRING)
-                                .with(JsonGenerator.Feature.QUOTE_FIELD_NAMES)
+                                .with(EnumFeature.WRITE_ENUMS_USING_TO_STRING)
+                                .with(JsonWriteFeature.QUOTE_PROPERTY_NAMES)
                                 .without(SerializationFeature.FAIL_ON_EMPTY_BEANS)
                                 .withoutFeatures(SerializationFeature.FAIL_ON_UNWRAPPED_TYPE_IDENTIFIERS));
 
@@ -141,8 +158,8 @@ public class ObjectMapperBinder
                         objectMapper
                                 .writer()
                                 .without(SerializationFeature.INDENT_OUTPUT)
-                                .with(SerializationFeature.WRITE_ENUMS_USING_TO_STRING)
-                                .with(JsonGenerator.Feature.QUOTE_FIELD_NAMES)
+                                .with(EnumFeature.WRITE_ENUMS_USING_TO_STRING)
+                                .with(JsonWriteFeature.QUOTE_PROPERTY_NAMES)
                                 .without(SerializationFeature.FAIL_ON_EMPTY_BEANS)
                                 .withoutFeatures(SerializationFeature.FAIL_ON_UNWRAPPED_TYPE_IDENTIFIERS));
 
@@ -165,8 +182,8 @@ public class ObjectMapperBinder
                         javaScriptObjectMapper
                                 .writerWithDefaultPrettyPrinter()
                                 .with(SerializationFeature.INDENT_OUTPUT)
-                                .with(SerializationFeature.WRITE_ENUMS_USING_TO_STRING)
-                                .without(JsonGenerator.Feature.QUOTE_FIELD_NAMES)
+                                .with(EnumFeature.WRITE_ENUMS_USING_TO_STRING)
+                                .without(JsonWriteFeature.QUOTE_PROPERTY_NAMES)
                                 .without(SerializationFeature.FAIL_ON_EMPTY_BEANS)
                                 .withoutFeatures(SerializationFeature.FAIL_ON_UNWRAPPED_TYPE_IDENTIFIERS));
 
@@ -175,8 +192,8 @@ public class ObjectMapperBinder
                         javaScriptObjectMapper
                                 .writer()
                                 .without(SerializationFeature.INDENT_OUTPUT)
-                                .with(SerializationFeature.WRITE_ENUMS_USING_TO_STRING)
-                                .without(JsonGenerator.Feature.QUOTE_FIELD_NAMES)
+                                .with(EnumFeature.WRITE_ENUMS_USING_TO_STRING)
+                                .without(JsonWriteFeature.QUOTE_PROPERTY_NAMES)
                                 .without(SerializationFeature.FAIL_ON_EMPTY_BEANS)
                                 .withoutFeatures(SerializationFeature.FAIL_ON_UNWRAPPED_TYPE_IDENTIFIERS));
 

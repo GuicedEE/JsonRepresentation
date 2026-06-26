@@ -1,9 +1,8 @@
 package com.guicedee.modules.services.jsonrepresentation.json;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.ValueDeserializer;
 import com.google.common.base.Strings;
 
 import java.io.IOException;
@@ -23,7 +22,7 @@ import static com.guicedee.modules.services.jsonrepresentation.json.StaticString
  * Lenient {@link Instant} deserializer that accepts localized date-time strings.
  */
 public class InstantDeserializer
-		extends JsonDeserializer<Instant>
+		extends ValueDeserializer<Instant>
 {
 	private static final DateTimeFormatter[] formats = new DateTimeFormatter[]
 			                                                   {
@@ -48,7 +47,7 @@ public class InstantDeserializer
 	 * @throws IOException when parsing fails
 	 */
 	@Override
-	public Instant deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JsonProcessingException
+	public Instant deserialize(JsonParser p, DeserializationContext ctxt)
 	{
 		String name = p.getValueAsString();
 		return convert(name);
@@ -61,7 +60,7 @@ public class InstantDeserializer
 	 * @return the parsed instant, or null when input is empty
 	 * @throws IOException when no supported format matches
 	 */
-	public Instant convert(String value) throws IOException
+	public Instant convert(String value)
 	{
 		if (Strings.isNullOrEmpty(value) || STRING_NULL.equals(value) || STRING_0.equals(value))
 		{
@@ -87,7 +86,7 @@ public class InstantDeserializer
 		}
 		if (time == null)
 		{
-			throw new IOException("Unable to determine local date time from string - [" + value + "]");
+			throw new IllegalArgumentException("Unable to determine local date time from string - [" + value + "]");
 
 		}
 		return time.atZone(ZoneId.systemDefault())

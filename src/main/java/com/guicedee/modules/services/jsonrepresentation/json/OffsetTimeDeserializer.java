@@ -1,9 +1,8 @@
 package com.guicedee.modules.services.jsonrepresentation.json;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.ValueDeserializer;
 import com.google.common.base.Strings;
 import lombok.extern.java.Log;
 
@@ -22,7 +21,7 @@ import static com.guicedee.modules.services.jsonrepresentation.json.StaticString
  */
 @Log
 public class OffsetTimeDeserializer
-		extends JsonDeserializer<OffsetTime>
+		extends ValueDeserializer<OffsetTime>
 {
 	private static final DateTimeFormatter[] formats = new DateTimeFormatter[]
 			                                                   {
@@ -42,7 +41,7 @@ public class OffsetTimeDeserializer
 	 * @throws IOException when parsing fails
 	 */
 	@Override
-	public OffsetTime deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JsonProcessingException
+	public OffsetTime deserialize(JsonParser p, DeserializationContext ctxt)
 	{
 		String name = p.getValueAsString();
 		return convert(name);

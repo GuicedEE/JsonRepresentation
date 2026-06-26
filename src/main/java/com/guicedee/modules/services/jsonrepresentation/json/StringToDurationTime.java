@@ -1,8 +1,8 @@
 package com.guicedee.modules.services.jsonrepresentation.json;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.ValueDeserializer;
 import com.google.common.base.Strings;
 import org.apache.commons.lang3.StringUtils;
 
@@ -16,7 +16,7 @@ import static com.guicedee.modules.services.jsonrepresentation.json.StaticString
  * Lenient {@link Duration} deserializer that accepts HHmm numeric strings
  * or ISO-8601 duration values.
  */
-public class StringToDurationTime extends JsonDeserializer<Duration> {
+public class StringToDurationTime extends ValueDeserializer<Duration> {
     private static final NumberFormat nf = NumberFormat.getInstance();
 
     static {
@@ -32,7 +32,7 @@ public class StringToDurationTime extends JsonDeserializer<Duration> {
      * @throws IOException when parsing fails
      */
     @Override
-    public Duration deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
+    public Duration deserialize(JsonParser p, DeserializationContext ctxt) {
         String name = p.getValueAsString();
         return convert(name);
     }

@@ -1,8 +1,8 @@
 package com.guicedee.modules.services.jsonrepresentation.json;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.ValueDeserializer;
 import com.google.common.base.Strings;
 
 import java.io.IOException;
@@ -11,7 +11,7 @@ import java.io.IOException;
  * Lenient boolean deserializer that accepts multiple string forms.
  */
 public class StringToBoolean
-		extends JsonDeserializer<Boolean>
+		extends ValueDeserializer<Boolean>
 {
 	public static boolean nullable = true;
 
@@ -24,7 +24,7 @@ public class StringToBoolean
 	 * @throws IOException when parsing fails
 	 */
 	@Override
-	public Boolean deserialize(JsonParser p, DeserializationContext ctxt) throws IOException
+	public Boolean deserialize(JsonParser p, DeserializationContext ctxt)
 	{
 		return convert(p.getValueAsString());
 	}

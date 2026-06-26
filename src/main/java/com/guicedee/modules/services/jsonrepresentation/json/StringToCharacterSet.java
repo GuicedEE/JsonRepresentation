@@ -1,8 +1,8 @@
 package com.guicedee.modules.services.jsonrepresentation.json;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.ValueDeserializer;
 import com.google.common.base.Strings;
 import org.apache.commons.lang3.StringEscapeUtils;
 
@@ -14,7 +14,7 @@ import java.util.Set;
  * Deserializes a JSON string into a set of characters.
  */
 public class StringToCharacterSet
-		extends JsonDeserializer<Set<Character>>
+		extends ValueDeserializer<Set<Character>>
 {
 	/**
 	 * Converts the JSON string into a linked set of characters.
@@ -25,7 +25,7 @@ public class StringToCharacterSet
 	 * @throws IOException when parsing fails
 	 */
 	@Override
-	public Set<Character> deserialize(JsonParser p, DeserializationContext ctxt) throws IOException
+	public Set<Character> deserialize(JsonParser p, DeserializationContext ctxt)
 	{
 		Set<Character> chars = new LinkedHashSet<>();
 		String value = p.getValueAsString();

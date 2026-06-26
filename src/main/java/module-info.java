@@ -8,15 +8,15 @@ module com.guicedee.jsonrepresentation {
 	exports com.guicedee.modules.services.jsonrepresentation;
 	exports com.guicedee.modules.services.jsonrepresentation.json;
 	
-	requires transitive com.fasterxml.jackson.databind;
-	requires transitive com.fasterxml.jackson.core;
+	requires transitive tools.jackson.databind;
+	requires transitive tools.jackson.core;
 
 	requires com.guicedee.client;
 	requires org.apache.commons.lang3;
 	
 	requires static lombok;
 	requires java.logging;
-	requires com.fasterxml.jackson.datatype.jsr310;
+	requires com.fasterxml.jackson.annotation;
 
 	requires static jakarta.inject;
 	

@@ -1,26 +1,20 @@
 package com.guicedee.modules.services.jsonrepresentation;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.StreamReadConstraints;
-import com.fasterxml.jackson.core.json.JsonReadFeature;
-import com.fasterxml.jackson.core.json.JsonWriteFeature;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectReader;
+import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.cfg.DateTimeFeature;
+import tools.jackson.databind.cfg.EnumFeature;
 import com.guicedee.modules.services.jsonrepresentation.implementations.ObjectMapperBinder;
 import com.guicedee.modules.services.jsonrepresentation.json.LaxJsonModule;
 
 import java.io.*;
 import java.net.URL;
 import java.util.*;
-
-import static com.fasterxml.jackson.core.JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS;
 
 /**
  * Convenience interface for JSON serialization/deserialization using a configured
@@ -34,39 +28,40 @@ public interface IJsonRepresentation<J> extends Serializable
 {
     /**
      * Applies the module's standard configuration to the supplied mapper.
+     * <p>
+     * Jackson 3 mappers are immutable, so this returns a reconfigured copy of the
+     * supplied mapper rather than mutating it in place.
      *
-     * @param mapper the mapper to configure
+     * @param mapper the mapper to base the configuration on
+     * @return a new, configured {@link ObjectMapper}
      */
-    static void configureObjectMapper(ObjectMapper mapper)
+    static ObjectMapper configureObjectMapper(ObjectMapper mapper)
     {
-        // Apply StreamReadConstraints to the mapper's existing factory so that
-        // Vert.x DatabindCodec (and any other externally-created mapper) also
-        // honours the increased max string length for large payloads.
-        int maxStringLength = Integer.parseInt(
-                System.getProperty("JSON_MAX_STRING_LENGTH",
-                        System.getenv().getOrDefault("JSON_MAX_STRING_LENGTH", String.valueOf(250 * 1024 * 1024))));
-        mapper.getFactory().setStreamReadConstraints(
-                StreamReadConstraints.builder()
-                        .maxStringLength(maxStringLength)
-                        .build());
-
-        mapper.registerModule(new LaxJsonModule())
-                .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+        return mapper.rebuild()
+                .addModule(new LaxJsonModule())
+                .configure(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS, false)
                 .configure(DeserializationFeature.FAIL_ON_MISSING_CREATOR_PROPERTIES, false)
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-                .configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
-                .configure(JsonGenerator.Feature.ESCAPE_NON_ASCII, true)
-                .configure(JsonGenerator.Feature.QUOTE_FIELD_NAMES, true)
-                .configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true)
-                .configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true)
-                .configure(JsonWriteFeature.QUOTE_FIELD_NAMES.mappedFeature(), true)
-                .configure(JsonReadFeature.ALLOW_UNQUOTED_FIELD_NAMES.mappedFeature(), true)
-                .enable(ALLOW_UNQUOTED_CONTROL_CHARS)
-                .setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY)
-                .setVisibility(PropertyAccessor.GETTER, JsonAutoDetect.Visibility.NONE)
-                .setVisibility(PropertyAccessor.IS_GETTER, JsonAutoDetect.Visibility.NONE)
-                .setVisibility(PropertyAccessor.SETTER, JsonAutoDetect.Visibility.NONE);
+                .configure(EnumFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
+                .changeDefaultVisibility(vc -> vc
+                        .withFieldVisibility(JsonAutoDetect.Visibility.ANY)
+                        .withGetterVisibility(JsonAutoDetect.Visibility.NONE)
+                        .withIsGetterVisibility(JsonAutoDetect.Visibility.NONE)
+                        .withSetterVisibility(JsonAutoDetect.Visibility.NONE))
+                .build();
+    }
+
+    /**
+     * Registers an additional Jackson module onto the shared mappers.
+     * <p>
+     * Jackson 3 mappers are immutable, so this rebuilds the shared instances with the supplied
+     * module applied. Intended for plugins that contribute custom (de)serializers at startup.
+     *
+     * @param module the Jackson module to add
+     */
+    static void registerModule(tools.jackson.databind.JacksonModule module)
+    {
+        ObjectMapperBinder.registerModule(module);
     }
 
     /**
@@ -92,14 +87,15 @@ public interface IJsonRepresentation<J> extends Serializable
         {
             if (tiny)
             {
-                return objectMapper.disable(SerializationFeature.INDENT_OUTPUT)
+                return objectMapper.writer()
+                        .without(SerializationFeature.INDENT_OUTPUT)
                         .writeValueAsString(this);
             } else
             {
                 return objectMapper.writerWithDefaultPrettyPrinter()
                         .writeValueAsString(this);
             }
-        } catch (JsonProcessingException e)
+        } catch (JacksonException e)
         {
             throw new JsonRenderException("Unable to serialize as JSON", e);
         }
@@ -118,7 +114,7 @@ public interface IJsonRepresentation<J> extends Serializable
         {
             return objectMapper.readerForUpdating(this)
                     .readValue(json);
-        } catch (IOException e)
+        } catch (JacksonException e)
         {
             throw new JsonRenderException("Unable to serialize as JSON", e);
         }
@@ -140,7 +136,7 @@ public interface IJsonRepresentation<J> extends Serializable
                     {
                     })
                     .readValue(json);
-        } catch (IOException e)
+        } catch (JacksonException e)
         {
             throw new JsonRenderException("Unable to serialize as JSON", e);
         }
@@ -164,7 +160,7 @@ public interface IJsonRepresentation<J> extends Serializable
                     {
                     })
                     .readValue(json);
-        } catch (IOException e)
+        } catch (JacksonException e)
         {
             throw new JsonRenderException("Unable to serialize as JSON", e);
         }
@@ -265,8 +261,11 @@ public interface IJsonRepresentation<J> extends Serializable
      */
     static <T> T From(URL content, Class<T> clazz) throws IOException
     {
-        return getJsonObjectReader().forType(clazz)
-                .readValue(content);
+        try (InputStream stream = content.openStream())
+        {
+            return getJsonObjectReader().forType(clazz)
+                    .readValue(stream);
+        }
     }
 
 
@@ -288,7 +287,7 @@ public interface IJsonRepresentation<J> extends Serializable
                     .reader()
                     .forType(clazz)
                     .readValue(file);
-        } catch (IOException e)
+        } catch (JacksonException e)
         {
             throw new JsonRenderException("Unable to read the input stream ", e);
         }
@@ -308,10 +307,14 @@ public interface IJsonRepresentation<J> extends Serializable
      */
     static <T> List<T> fromToList(URL content, Class<T> clazz) throws IOException
     {
-        T list = ObjectMapperBinder.getObjectMapper()
-                .reader()
-                .forType(clazz)
-                .readValue(content);
+        T list;
+        try (InputStream stream = content.openStream())
+        {
+            list = ObjectMapperBinder.getObjectMapper()
+                    .reader()
+                    .forType(clazz)
+                    .readValue(stream);
+        }
         ArrayList<T> lists = new ArrayList<>();
         lists.addAll(Arrays.asList((T[]) list));
         return lists;

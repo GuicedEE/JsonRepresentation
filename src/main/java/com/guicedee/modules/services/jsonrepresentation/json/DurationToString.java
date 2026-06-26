@@ -1,8 +1,8 @@
 package com.guicedee.modules.services.jsonrepresentation.json;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.ValueSerializer;
+import tools.jackson.databind.SerializationContext;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -11,7 +11,7 @@ import java.time.Duration;
  * Serializes {@link Duration} values to their ISO-8601 string form.
  */
 public class DurationToString
-		extends JsonSerializer<Duration>
+		extends ValueSerializer<Duration>
 {
 	/**
 	 * Writes the duration as an ISO-8601 string.
@@ -22,7 +22,7 @@ public class DurationToString
 	 * @throws IOException when writing fails
 	 */
 	@Override
-	public void serialize(Duration value, JsonGenerator gen, SerializerProvider serializers) throws IOException
+	public void serialize(Duration value, JsonGenerator gen, SerializationContext serializers)
 	{
 		if(value == null)
 			return ;
