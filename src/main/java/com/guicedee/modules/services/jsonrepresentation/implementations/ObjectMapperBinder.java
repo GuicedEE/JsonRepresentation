@@ -141,7 +141,7 @@ public class ObjectMapperBinder
                     .toProvider(p);
         }
 
-        log.fine("Bound ObjectWriter.class @Named(JSON)");
+        log.finest("Bound ObjectWriter.class @Named(JSON)");
 
         bind(ObjectBinderKeys.JSONObjectWriter)
                 .toProvider(() ->
@@ -172,7 +172,7 @@ public class ObjectMapperBinder
                                 .without(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
                 );
 
-        log.fine("Bound ObjectWriter.class @Named(JavaScriptObjectReader)");
+        log.finest("Bound ObjectWriter.class @Named(JavaScriptObjectReader)");
         bind(ObjectBinderKeys.JavascriptObjectMapper)
                 .toInstance(javaScriptObjectMapper);
 
