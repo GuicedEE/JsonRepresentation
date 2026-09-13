@@ -161,6 +161,10 @@ public class LocalDateTimeDeserializer
 			value = value.replaceAll(STRING_DOT_ESCAPED, STRING_EMPTY)
 			             .substring(0, value.indexOf(E) - 1);
 		}
+        if("+1000000000-01-01T00:00:00.00000000".equals(value))
+		{
+			return LocalDateTime.MIN;
+		}
 		LocalDateTime time = null;
 		for (DateTimeFormatter format : formats)
 		{
