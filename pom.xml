@@ -116,6 +116,13 @@
             </dependency>
             <dependency>
                 <groupId>com.guicedee</groupId>
+                <artifactId>jakarta-bom</artifactId>
+                <version>${guicedee.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.guicedee</groupId>
                 <artifactId>fasterxml-bom</artifactId>
                 <version>${guicedee.version}</version>
                 <type>pom</type>
