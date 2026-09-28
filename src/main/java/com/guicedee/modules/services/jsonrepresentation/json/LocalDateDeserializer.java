@@ -6,7 +6,6 @@ import tools.jackson.databind.ValueDeserializer;
 import com.google.common.base.Strings;
 import lombok.extern.java.Log;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.logging.Level;
 
@@ -25,7 +24,6 @@ public class LocalDateDeserializer
 	 * @param p the parser positioned at a scalar value
 	 * @param ctxt the deserialization context
 	 * @return the parsed date, or null when input is empty
-	 * @throws IOException when parsing fails
 	 */
 	@Override
 	public LocalDate deserialize(JsonParser p, DeserializationContext ctxt)

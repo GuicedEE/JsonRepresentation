@@ -5,7 +5,6 @@ import tools.jackson.databind.DeserializationContext;
 import tools.jackson.databind.ValueDeserializer;
 import com.google.common.base.Strings;
 
-import java.io.IOException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -44,7 +43,6 @@ public class InstantDeserializer
 	 * @param p the parser positioned at a scalar value
 	 * @param ctxt the deserialization context
 	 * @return the parsed instant, or null when input is empty
-	 * @throws IOException when parsing fails
 	 */
 	@Override
 	public Instant deserialize(JsonParser p, DeserializationContext ctxt)
@@ -58,7 +56,6 @@ public class InstantDeserializer
 	 *
 	 * @param value the input string
 	 * @return the parsed instant, or null when input is empty
-	 * @throws IOException when no supported format matches
 	 */
 	public Instant convert(String value)
 	{

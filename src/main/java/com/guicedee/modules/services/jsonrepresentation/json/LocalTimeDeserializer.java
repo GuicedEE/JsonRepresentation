@@ -5,7 +5,6 @@ import tools.jackson.databind.DeserializationContext;
 import tools.jackson.databind.ValueDeserializer;
 import com.google.common.base.Strings;
 
-import java.io.IOException;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -26,7 +25,6 @@ public class LocalTimeDeserializer
 	 * @param p the parser positioned at a scalar value
 	 * @param ctxt the deserialization context
 	 * @return the parsed time, or null when input is empty
-	 * @throws IOException when parsing fails
 	 */
 	@Override
 	public LocalTime deserialize(JsonParser p, DeserializationContext ctxt)

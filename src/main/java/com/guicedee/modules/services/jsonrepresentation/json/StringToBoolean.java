@@ -5,7 +5,6 @@ import tools.jackson.databind.DeserializationContext;
 import tools.jackson.databind.ValueDeserializer;
 import com.google.common.base.Strings;
 
-import java.io.IOException;
 
 /**
  * Lenient boolean deserializer that accepts multiple string forms.
@@ -21,7 +20,6 @@ public class StringToBoolean
 	 * @param p the parser positioned at a scalar value
 	 * @param ctxt the deserialization context
 	 * @return the parsed Boolean value
-	 * @throws IOException when parsing fails
 	 */
 	@Override
 	public Boolean deserialize(JsonParser p, DeserializationContext ctxt)

@@ -6,7 +6,6 @@ import tools.jackson.databind.ValueDeserializer;
 import com.google.common.base.Strings;
 import lombok.extern.java.Log;
 
-import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
@@ -41,7 +40,6 @@ public class ZonedDateTimeDeserializer
 	 * @param p the parser positioned at a scalar value
 	 * @param ctxt the deserialization context
 	 * @return the parsed zoned date-time, or null when input is empty
-	 * @throws IOException when parsing fails
 	 */
 	@Override
 	public ZonedDateTime deserialize(JsonParser p, DeserializationContext ctxt)

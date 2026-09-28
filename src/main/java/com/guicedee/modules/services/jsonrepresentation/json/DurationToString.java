@@ -4,7 +4,6 @@ import tools.jackson.core.JsonGenerator;
 import tools.jackson.databind.ValueSerializer;
 import tools.jackson.databind.SerializationContext;
 
-import java.io.IOException;
 import java.time.Duration;
 
 /**
@@ -19,7 +18,6 @@ public class DurationToString
 	 * @param value the duration to serialize
 	 * @param gen the JSON generator
 	 * @param serializers the serializer provider
-	 * @throws IOException when writing fails
 	 */
 	@Override
 	public void serialize(Duration value, JsonGenerator gen, SerializationContext serializers)

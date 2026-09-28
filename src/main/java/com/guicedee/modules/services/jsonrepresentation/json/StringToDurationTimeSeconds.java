@@ -6,7 +6,6 @@ import tools.jackson.databind.ValueDeserializer;
 import com.google.common.base.Strings;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.IOException;
 import java.text.NumberFormat;
 import java.time.Duration;
 
@@ -29,7 +28,6 @@ public class StringToDurationTimeSeconds extends ValueDeserializer<Duration> {
      * @param p the parser positioned at a scalar value
      * @param ctxt the deserialization context
      * @return the parsed duration, or null when input is empty
-     * @throws IOException when parsing fails
      */
     @Override
     public Duration deserialize(JsonParser p, DeserializationContext ctxt) {

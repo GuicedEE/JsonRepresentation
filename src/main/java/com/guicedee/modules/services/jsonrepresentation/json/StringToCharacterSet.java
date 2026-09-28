@@ -6,7 +6,6 @@ import tools.jackson.databind.ValueDeserializer;
 import com.google.common.base.Strings;
 import org.apache.commons.lang3.StringEscapeUtils;
 
-import java.io.IOException;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -22,7 +21,6 @@ public class StringToCharacterSet
 	 * @param p the parser positioned at a scalar value
 	 * @param ctxt the deserialization context
 	 * @return a set of characters in encounter order
-	 * @throws IOException when parsing fails
 	 */
 	@Override
 	public Set<Character> deserialize(JsonParser p, DeserializationContext ctxt)

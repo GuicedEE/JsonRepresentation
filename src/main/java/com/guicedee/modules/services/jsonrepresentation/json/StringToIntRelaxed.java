@@ -5,7 +5,6 @@ import tools.jackson.databind.DeserializationContext;
 import tools.jackson.databind.ValueDeserializer;
 import com.google.common.base.Strings;
 
-import java.io.IOException;
 
 /**
  * Lenient primitive integer deserializer that accepts numeric strings with decimals.
@@ -19,7 +18,6 @@ public class StringToIntRelaxed
 	 * @param p the parser positioned at a scalar value
 	 * @param ctxt the deserialization context
 	 * @return the parsed integer value
-	 * @throws IOException when parsing fails
 	 */
 	@Override
 	public Object deserialize(JsonParser p, DeserializationContext ctxt)

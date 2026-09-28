@@ -4,7 +4,6 @@ import tools.jackson.core.JsonGenerator;
 import tools.jackson.databind.ValueSerializer;
 import tools.jackson.databind.SerializationContext;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -24,7 +23,6 @@ public class ZonedDateTimeSerializer
 	 * @param value the date-time to serialize
 	 * @param generator the JSON generator
 	 * @param provider the serializer provider
-	 * @throws IOException when writing fails
 	 */
 	@Override
 	public void serialize(LocalDateTime value, JsonGenerator generator, SerializationContext provider)

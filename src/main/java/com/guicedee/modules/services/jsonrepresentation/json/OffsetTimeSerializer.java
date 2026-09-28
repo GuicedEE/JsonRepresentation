@@ -4,7 +4,6 @@ import tools.jackson.core.JsonGenerator;
 import tools.jackson.databind.ValueSerializer;
 import tools.jackson.databind.SerializationContext;
 
-import java.io.IOException;
 import java.time.OffsetTime;
 import java.time.format.DateTimeFormatter;
 
@@ -24,7 +23,6 @@ public class OffsetTimeSerializer
 	 * @param value the offset time to serialize
 	 * @param generator the JSON generator
 	 * @param provider the serializer provider
-	 * @throws IOException when writing fails
 	 */
 	@Override
 	public void serialize(OffsetTime value, JsonGenerator generator, SerializationContext provider)

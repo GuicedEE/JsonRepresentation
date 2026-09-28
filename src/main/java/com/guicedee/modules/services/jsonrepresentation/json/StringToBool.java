@@ -4,7 +4,6 @@ import tools.jackson.core.JsonParser;
 import tools.jackson.databind.DeserializationContext;
 import tools.jackson.databind.ValueDeserializer;
 
-import java.io.IOException;
 
 /**
  * Lenient primitive boolean deserializer that defaults to false for unknown values.
@@ -18,7 +17,6 @@ public class StringToBool
 	 * @param p the parser positioned at a scalar value
 	 * @param ctxt the deserialization context
 	 * @return the parsed boolean value
-	 * @throws IOException when parsing fails
 	 */
 	@Override
 	public Object deserialize(JsonParser p, DeserializationContext ctxt)
