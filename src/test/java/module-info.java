@@ -1,5 +1,6 @@
 module com.guicedee.jsonrepresentation.test {
     requires com.guicedee.jsonrepresentation;
+    requires com.guicedee.client;
     requires org.junit.jupiter.api;
     requires tools.jackson.databind;
     requires com.fasterxml.jackson.annotation;

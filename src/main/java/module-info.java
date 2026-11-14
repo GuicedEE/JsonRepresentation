@@ -7,6 +7,7 @@ import com.guicedee.client.services.lifecycle.IGuiceModule;
 module com.guicedee.jsonrepresentation {
 	exports com.guicedee.modules.services.jsonrepresentation;
 	exports com.guicedee.modules.services.jsonrepresentation.json;
+    exports com.guicedee.vertx.spi.json;
 	
 	requires transitive tools.jackson.databind;
 	requires transitive tools.jackson.core;
@@ -21,4 +22,6 @@ module com.guicedee.jsonrepresentation {
 	requires static jakarta.inject;
 	
 	provides IGuiceModule with com.guicedee.modules.services.jsonrepresentation.implementations.ObjectMapperBinder;
+    provides com.guicedee.client.services.IJsonCodec with com.guicedee.modules.services.jsonrepresentation.implementations.JacksonJsonCodec;
+    provides io.vertx.core.spi.JsonFactory with com.guicedee.vertx.spi.json.GuicedVertxJsonFactory;
 }

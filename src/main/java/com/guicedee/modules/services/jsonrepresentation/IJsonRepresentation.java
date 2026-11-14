@@ -37,7 +37,9 @@ public interface IJsonRepresentation<J> extends Serializable
      */
     static ObjectMapper configureObjectMapper(ObjectMapper mapper)
     {
-        return mapper.rebuild()
+        var builder = mapper.rebuild();
+        com.guicedee.modules.services.jsonrepresentation.json.CoreJsonMixins.configure(builder);
+        return builder
                 .addModule(new LaxJsonModule())
                 .configure(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS, false)
                 .configure(DeserializationFeature.FAIL_ON_MISSING_CREATOR_PROPERTIES, false)

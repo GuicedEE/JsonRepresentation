@@ -6,7 +6,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.guicedee.client.services.lifecycle.IGuiceModule;
-import com.guicedee.client.implementations.ObjectBinderKeys;
+import com.guicedee.modules.services.jsonrepresentation.ObjectBinderKeys;
 import com.guicedee.modules.services.jsonrepresentation.json.LaxJsonModule;
 
 import lombok.Getter;
@@ -24,8 +24,8 @@ import tools.jackson.databind.cfg.DateTimeFeature;
 import tools.jackson.databind.cfg.EnumFeature;
 import tools.jackson.databind.json.JsonMapper;
 
-import static com.guicedee.client.implementations.ObjectBinderKeys.DefaultObjectMapper;
-import static com.guicedee.client.implementations.ObjectBinderKeys.JavaScriptObjectWriter;
+import static com.guicedee.modules.services.jsonrepresentation.ObjectBinderKeys.DefaultObjectMapper;
+import static com.guicedee.modules.services.jsonrepresentation.ObjectBinderKeys.JavaScriptObjectWriter;
 
 /**
  * Guice module that binds shared {@link ObjectMapper} instances and configured
@@ -45,8 +45,7 @@ public class ObjectMapperBinder
      * Configurable via the system property / environment variable {@code JSON_MAX_STRING_LENGTH}.
      */
     private static final int MAX_STRING_LENGTH = Integer.parseInt(
-            System.getProperty("JSON_MAX_STRING_LENGTH",
-                    System.getenv().getOrDefault("JSON_MAX_STRING_LENGTH", String.valueOf(250 * 1024 * 1024))));
+            com.guicedee.client.Environment.getSystemPropertyOrEnvironment("JSON_MAX_STRING_LENGTH", String.valueOf(250 * 1024 * 1024)));
 
     /**
      * If the object mapper must behave as a singleton
@@ -117,6 +116,7 @@ public class ObjectMapperBinder
             builder = builder.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS, true);
         }
 
+        com.guicedee.modules.services.jsonrepresentation.json.CoreJsonMixins.configure(builder);
         return builder.build();
     }
 

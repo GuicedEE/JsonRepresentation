@@ -6,7 +6,7 @@
 
 ![Java 25+](https://img.shields.io/badge/Java-25%2B-green)
 ![Guice 7](https://img.shields.io/badge/Guice-7%2B-green)
-![Jackson](https://img.shields.io/badge/Jackson-2.21.x-green)
+![Jackson](https://img.shields.io/badge/Jackson-3.x-green)
 
 Pre-configured [Jackson](https://github.com/FasterXML/jackson) ObjectMapper setup, Guice bindings, and a mixin interface for painless JSON serialization/deserialization across the [GuicedEE](https://github.com/GuicedEE) ecosystem.
 
@@ -15,6 +15,8 @@ Provides two ready-to-use `ObjectMapper` instances (standard JSON and JavaScript
 Built on [Jackson Databind](https://github.com/FasterXML/jackson-databind) · JPMS module `com.guicedee.jsonrepresentation` · Java 25+
 
 ## 📦 Installation
+
+This library is opt-in. GuicedEE core does not depend on Jackson. Adding the library activates its client `IJsonCodec`, Guice mapper bindings and Vert.x `JsonFactory` providers through SPI on both the module path and classpath. No scanning or enable flag is needed. See [activation, alternative providers and migration](../../client/JSON_OPT_IN.md).
 
 ```xml
 <dependency>
@@ -27,7 +29,7 @@ Built on [Jackson Databind](https://github.com/FasterXML/jackson-databind) · JP
 <summary>Gradle (Kotlin DSL)</summary>
 
 ```kotlin
-implementation("com.guicedee.modules.representations:json-representation:2.4.1")
+implementation("com.guicedee.modules.representations:json-representation:2.5.1")
 ```
 </details>
 
@@ -108,6 +110,8 @@ Large payloads are supported out of the box. The maximum JSON string length defa
 `ObjectMapperBinder` is an `IGuiceModule` discovered automatically via ServiceLoader / JPMS.
 It binds the following keys into the Guice injector (all from `ObjectBinderKeys`):
 
+Import `com.guicedee.modules.services.jsonrepresentation.ObjectBinderKeys`; the keys no longer live in client because their API contains Jackson types.
+
 | Guice Key | Type | Description |
 |---|---|---|
 | `DefaultObjectMapper` | `ObjectMapper` | Standard mapper (singleton by default) |
@@ -125,7 +129,7 @@ Inject them anywhere:
 @Inject @Named("JSON")
 private ObjectWriter jsonWriter;
 
-@Inject
+@Inject @Named("Default")
 private ObjectMapper mapper;  // DefaultObjectMapper
 ```
 
@@ -181,10 +185,10 @@ StaticStrings.STRING_FORWARD_SLASH       // "/"
 
 ```
 com.guicedee.jsonrepresentation
- ├── com.fasterxml.jackson.databind       (ObjectMapper, serializers)
- ├── com.fasterxml.jackson.core           (streaming API)
- ├── com.fasterxml.jackson.datatype.jsr310 (Java Time support)
- ├── com.guicedee.client                  (SPI contracts, ObjectBinderKeys)
+ ├── tools.jackson.databind               (ObjectMapper, serializers, Java Time)
+ ├── tools.jackson.core                   (streaming API)
+ ├── com.fasterxml.jackson.annotation     (annotation API)
+ ├── com.guicedee.client                  (SPI contracts)
  └── org.apache.commons.lang3
 ```
 
@@ -197,12 +201,16 @@ module com.guicedee.jsonrepresentation {
     exports com.guicedee.modules.services.jsonrepresentation;
     exports com.guicedee.modules.services.jsonrepresentation.json;
 
-    requires transitive com.fasterxml.jackson.databind;
-    requires transitive com.fasterxml.jackson.core;
+    requires transitive tools.jackson.databind;
+    requires transitive tools.jackson.core;
     requires com.guicedee.client;
 
     provides IGuiceModule
         with ObjectMapperBinder;
+    provides IJsonCodec
+        with JacksonJsonCodec;
+    provides io.vertx.core.spi.JsonFactory
+        with GuicedVertxJsonFactory;
 }
 ```
 
